@@ -1,0 +1,26 @@
+select {
+  margin: 2px;
+  width: 140px;
+}
+
+input[type=range] {
+  outline: none;
+  -webkit-appearance: none;
+  width: 140px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  transition: opacity .4s ease-in;
+}
+
+input[type=range]:disabled::-webkit-slider-runnable-track {
+  opacity: 0;
+}
+
+.darkGreen {
+  color: #78cd51;
+}
+
+.red {
+  color: #ff5454;
+}
