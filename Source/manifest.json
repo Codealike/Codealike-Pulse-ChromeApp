@@ -13,10 +13,8 @@
   },
   "permissions": [
     "hid",
+    "https://fonts.googleapis.com/",
     "https://codealike.com/",
-    "http://fonts.googleapis.com/",
-    "http://maxcdn.bootstrapcdn.com/",
-    "https://www.gravatar.com/",
     {
       "usbDevices": [
         { "vendorId": 10168, "productId": 493 }

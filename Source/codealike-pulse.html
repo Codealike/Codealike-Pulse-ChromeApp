@@ -6,6 +6,9 @@
     <script src="blink1.js"></script>
     <script src="codealike-pulse.js"></script>
     <link href="/lib/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/lib/mdl/material.min.css">
+    <script src="/lib/mdl/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   </head>
   <body>
     <select id="picker" disabled>
@@ -14,7 +17,19 @@
     <input type="range" min="0" max="255" value="0" id="r" disabled />
     <input type="range" min="0" max="255" value="0" id="g" disabled />
     <input type="range" min="0" max="255" value="0" id="b" disabled />
-    <input type="text" id="username-add">
+
+  <div class="mdl-textfield mdl-js-textfield">
+    <input class="mdl-textfield__input" type="text" id="sample1">
+    <label class="mdl-textfield__label" for="sample1">Text...</label>
+  </div>
+<!-- Accent-colored raised button with ripple -->
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+  Button
+</button>
+<!-- Colored FAB button -->
+<button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
+  <i class="material-icons">add</i>
+</button>
 
 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 col-xxs-12">
                     <a href="/facts/federico.lois" target="_blank">
@@ -57,5 +72,36 @@
           </td>
         </tr>
       </table>
+
+<!-- Always shows a header, even in smaller screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">Title</span>
+      <!-- Add spacer, to align navigation to the right -->
+      <div class="mdl-layout-spacer"></div>
+      <!-- Navigation. We hide it in small screens. -->
+      <nav class="mdl-navigation mdl-layout--large-screen-only">
+        <a class="mdl-navigation__link" href="">Link</a>
+        <a class="mdl-navigation__link" href="">Link</a>
+        <a class="mdl-navigation__link" href="">Link</a>
+        <a class="mdl-navigation__link" href="">Link</a>
+      </nav>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Title</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+      <a class="mdl-navigation__link" href="">Link</a>
+    </nav>
+  </div>
+  <main class="mdl-layout__content">
+    <div class="page-content"><!-- Your content goes here --></div>
+  </main>
+</div>
   </body>
 </html>

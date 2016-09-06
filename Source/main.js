@@ -16,6 +16,6 @@ chrome.app.runtime.onLaunched.addListener(function() {
       "codealike-pulse.html", {
         id: "codealikePulse",
         innerBounds: { width: 160, height: 115 },
-        resizable: false
+        resizable: true
       }, onAppWindowCreated);
 });
