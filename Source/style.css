@@ -18,9 +18,21 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
 }
 
 .darkGreen {
-  color: #78cd51;
+  background-color: #78cd51;
 }
 
 .red {
-  color: #ff5454;
+  background-color: #ff5454;
+}
+
+.mdl-card--expand
+{
+  background-color:ivory;
+}
+
+.pulse-status
+{
+  height: 15px;
+  width: 100%;
+  display: block;
 }

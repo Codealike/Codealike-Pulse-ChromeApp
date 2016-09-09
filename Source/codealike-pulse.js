@@ -1,3 +1,40 @@
+$(document).ready(function(){
+  $("#add-user").click(function(){
+  addUser($("#username").val());
+  });
+
+
+  function getUser(username)
+  {
+    var userData = "soke/c12060a3-1ace-450a-b4ae-1eaec2ef4a31";
+    var tokenValues = userData.split("/");
+    var identity = tokenValues[0];
+    var token = tokenValues[1];
+
+    $.ajax({
+        type: "GET",
+        url: "https://codealike.com/api/v2/account/" + username + "/profile",
+        contentType: "application/json",
+        dataType: "json",
+        cache: false,
+        data: null,
+        beforeSend: function (request) {
+            request.setRequestHeader("X-Api-Identity", identity);
+            request.setRequestHeader("X-Api-Token", token);
+        },
+        complete: function (data, textStatus, jqXHR) {
+            if (data.statusText == "OK") {
+                return { result: "ok", data: data.responseJSON };
+            }
+            else {
+                console.log("Receiving activity from Server FAILED");
+                return { result: "failed" };
+            }
+        }
+    });
+  }
+});
+
 var bg = undefined;
 
 (function() {
