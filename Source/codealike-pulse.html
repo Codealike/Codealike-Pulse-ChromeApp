@@ -5,6 +5,8 @@
   <link rel="stylesheet" href="style.css">
   <script src="/lib/jquery-3.1.0.min.js"></script>
   <script src="blink1.js"></script>
+  <script src="/lib/mustache.js"></script>
+  <script src="/lib/ral.min.js"></script>
   <script src="codealike-pulse.js"></script>
   <link href="/lib/font-awesome.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/lib/mdl/material.min.css">
@@ -25,60 +27,6 @@
     <label class="mdl-textfield__label" for="sample1">Text...</label>
   </div>
   <!-- Accent-colored raised button with ripple -->
-
-  <!-- Colored FAB button -->
-
-
-  <div class="col-lg-4 col-md-4 col-sm-6 col-xs-6 col-xxs-12">
-    <a href="/facts/federico.lois" target="_blank">
-      <h1 class="user-name hidden-xs hidden-sm" title="Federico Andres Lois"><img src="https://www.gravatar.com/avatar/faaf2d9f5cd1b2b16ed6b7b98cb10373?d=https://www.gravatar.com/avatar/816426e76a556172add5b2143548d8e3"
-          class="avatar avatar-rounded" height="75" title="Federico Andres Lois"> <i class="circle-status circle_federicolois fa fa-circle grey"
-          data-username="federico.lois" data-title="May I Interrupt?" data-toggle="popover" data-content="<h3><i class=&quot;fa fa-circle red&quot;></i>  User is on fire. Think twice before interrupting.</h3>
-<h3><i class=&quot;fa fa-circle darkGreen&quot;></i>  User has few recent activity. It might not be disruptive to interrupt.</h3>
-<h3><i class=&quot;fa fa-circle grey&quot;></i>  User has not recent activity. It might not be very disruptive to interrupt.</h3>"
-          data-placement="down" data-html="true" data-trigger="hover" data-original-title="" title=""></i>
-        Federico Andres Lois</h1>
-      <h3 class="user-name hidden-lg hidden-md" title="Federico Andres Lois"><img src="https://www.gravatar.com/avatar/faaf2d9f5cd1b2b16ed6b7b98cb10373?d=https://www.gravatar.com/avatar/816426e76a556172add5b2143548d8e3"
-          class="avatar avatar-rounded" height="32" title="Federico Andres Lois"> <i class="circle-status circle_federicolois fa fa-circle grey"
-          data-username="federico.lois" data-title="May I Interrupt?" data-toggle="popover" data-content="<h3><i class=&quot;fa fa-circle red&quot;></i>  User is on fire. Think twice before interrupting.</h3>
-<h3><i class=&quot;fa fa-circle darkGreen&quot;></i>  User has few recent activity. It might not be disruptive to interrupt.</h3>
-<h3><i class=&quot;fa fa-circle grey&quot;></i>  User has not recent activity. It might not be very disruptive to interrupt.</h3>"
-          data-placement="down" data-html="true" data-trigger="hover" data-original-title="" title=""></i>
-        Federico Andres Lois</h3>
-    </a>
-    <br>
-  </div>
-
-  <table>
-    <tr id="0">
-      <td>
-        <h4 class="orange text-center">1st</h4>
-      </td>
-      <td>
-
-        <a id="u_nibelung" target="_blank" href="/facts/nibelung">
-          <p>
-            <i class="circle-status circle_nibelung fa fa-circle grey" data-username="nibelung" data-title="May I Interrupt?" data-toggle="popover"
-              data-content="<h3><i class=&quot;fa fa-circle red&quot;></i>  User is on fire. Think twice before interrupting.</h3>
-<h3><i class=&quot;fa fa-circle darkGreen&quot;></i>  User has few recent activity. It might not be disruptive to interrupt.</h3>
-<h3><i class=&quot;fa fa-circle grey&quot;></i>  User has not recent activity. It might not be very disruptive to interrupt.</h3>"
-              data-placement="down" data-html="true" data-trigger="hover"></i>
-
-            <img class="avatar avatar-rounded" src="https://www.gravatar.com/avatar/ccc0c95cb1fa24e095e557096eaf8b31?d=https://www.gravatar.com/avatar/816426e76a556172add5b2143548d8e3"
-              alt="Andy Pandy Cartwright" width="30" height="30">
-            <span class="black">Andy Pandy Cartwright</span>
-          </p>
-        </a>
-      </td>
-      <td class="text-center">
-        <div class="top-buffer">
-          <span class="label label-success"><i class="fa fa-arrow-up"></i> 26</span>
-
-
-        </div>
-      </td>
-    </tr>
-  </table>
 
   <!-- Always shows a header, even in smaller screens. -->
   <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
@@ -116,6 +64,8 @@
                 <label class="mdl-textfield__label" for="sample3">Codealike Username</label>
               </div>
 
+              <div id="add-user-spinner" class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>
+
               <button id="add-user" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
                 Add new user
               </button>
@@ -123,23 +73,6 @@
         </div>
 
         <div id="grid-cards" class="mdl-grid">
-
-          <div class="mdl-cell mdl-cell--2-col">
-            <div class="demo-card-square mdl-card mdl-shadow--2dp">
-              <div class="mdl-card__title mdl-card--expand">
-                <h2 class="mdl-card__title-text">Sebastian Fernandez Quezada</h2>
-              </div>
-              <div class="pulse-status red"></div>
-              <div class="mdl-card__supporting-text">
-                Think twice before interrupting this dev.
-              </div>
-              <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                  View Facts page
-                </a>
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>

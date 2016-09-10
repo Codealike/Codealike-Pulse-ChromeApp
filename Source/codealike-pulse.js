@@ -1,43 +1,74 @@
-$(document).ready(function(){
-  $("#add-user").click(function(){
-  addUser($("#username").val());
+$(document).ready(function () {
+  $("#add-user-spinner").hide();
+
+  $("#add-user").click(function () {
+    addUser($("#username").val());
   });
 
+  function addUser(username) {
 
-  function getUser(username)
-  {
+    $("#add-user").hide();
+    $("#add-user-spinner").show();
+
     var userData = "soke/c12060a3-1ace-450a-b4ae-1eaec2ef4a31";
     var tokenValues = userData.split("/");
     var identity = tokenValues[0];
     var token = tokenValues[1];
 
     $.ajax({
-        type: "GET",
-        url: "https://codealike.com/api/v2/account/" + username + "/profile",
-        contentType: "application/json",
-        dataType: "json",
-        cache: false,
-        data: null,
-        beforeSend: function (request) {
-            request.setRequestHeader("X-Api-Identity", identity);
-            request.setRequestHeader("X-Api-Token", token);
-        },
-        complete: function (data, textStatus, jqXHR) {
-            if (data.statusText == "OK") {
-                return { result: "ok", data: data.responseJSON };
-            }
-            else {
-                console.log("Receiving activity from Server FAILED");
-                return { result: "failed" };
-            }
+      type: "GET",
+      url: "https://codealike.com/api/v2/account/" + username + "/profile",
+      contentType: "application/json",
+      dataType: "json",
+      cache: false,
+      data: null,
+      beforeSend: function (request) {
+        request.setRequestHeader("X-Api-Identity", identity);
+        request.setRequestHeader("X-Api-Token", token);
+      },
+      complete: function (data, textStatus, jqXHR) {
+        if (data.statusText == "OK") {
+
+          $.get('assets/templates/user-card.mst', function (template) {
+            data.responseJSON.Identity = data.responseJSON.Identity.replace(/\./g, '');
+
+            var html = Mustache.to_html(template, data.responseJSON);
+            
+            $('#grid-cards').append(html);
+
+            var remoteImage, 
+                container = document.querySelector("#" + data.responseJSON.Identity + "-card .mdl-card__title");
+
+            remoteImage = new RAL.RemoteImage(data.responseJSON.AvatarUri);
+            container.appendChild(remoteImage.element);
+            remoteImage.src = data.responseJSON.AvatarUri;
+            RAL.Queue.add(remoteImage);
+            RAL.Queue.setMaxConnections(4);
+            RAL.Queue.start();
+
+            $("#add-user").show();
+            $("#add-user-spinner").hide();
+          });
+
         }
+        else {
+          console.log("Receiving activity from Server FAILED");
+          $("#add-user").show();
+          $("#add-user-spinner").hide();
+          return { result: "failed" };
+        }
+      }
     });
   }
 });
 
+chrome.alarms.onAlarm.addListener(function(alarm) {
+  updateCanInterruptStatusBatch();
+});
+
 var bg = undefined;
 
-(function() {
+(function () {
   var ui = {
     picker: null,
     r: null,
@@ -79,7 +110,7 @@ var bg = undefined;
   function onDevicesEnumerated(devices) {
     if (chrome.runtime.lastError) {
       console.error("Unable to enumerate devices: " +
-                    chrome.runtime.lastError.message);
+        chrome.runtime.lastError.message);
       return;
     }
 
@@ -90,7 +121,7 @@ var bg = undefined;
 
   function onDeviceAdded(device) {
     if (device.vendorId != Blink1.VENDOR_ID ||
-        device.productId != Blink1.PRODUCT_ID) {
+      device.productId != Blink1.PRODUCT_ID) {
       return;
     }
 
@@ -114,7 +145,7 @@ var bg = undefined;
     }
 
     if (option.selected) {
-      bg.blink1.disconnect(function() {});
+      bg.blink1.disconnect(function () { });
       bg.blink1 = undefined;
       enableControls(false);
       if (option.previousSibling) {
@@ -149,13 +180,13 @@ var bg = undefined;
       option.selected = true;
       setActiveDevice(blink1);
     } else {
-      blink1.disconnect(function () {});
+      blink1.disconnect(function () { });
     }
   }
 
   function setActiveDevice(blink1) {
     bg.blink1 = blink1;
-    bg.blink1.getRgb(0, function(r, g, b) {
+    bg.blink1.getRgb(0, function (r, g, b) {
       ui.r.value = r || 0;
       ui.g.value = g || 0;
       ui.b.value = b || 0;
@@ -166,7 +197,7 @@ var bg = undefined;
 
   function switchToDevice(optionIndex) {
     var deviceId =
-        parseInt(ui.picker.options[optionIndex].id.substring(7));
+      parseInt(ui.picker.options[optionIndex].id.substring(7));
     var blink1 = new Blink1(deviceId);
     blink1.connect(function (success) {
       if (success) {
@@ -176,7 +207,7 @@ var bg = undefined;
   }
 
   function onSelectionChanged() {
-    bg.blink1.disconnect(function() {});
+    bg.blink1.disconnect(function () { });
     bg.blink1 = undefined;
     enableControls(false);
     switchToDevice(ui.picker.selectedIndex);
@@ -190,101 +221,99 @@ var bg = undefined;
   function setGradients() {
     var r = ui.r.value, g = ui.g.value, b = ui.b.value;
     ui.r.style.background =
-       'linear-gradient(to right, rgb(0, ' + g + ', ' + b + '), ' +
-                                 'rgb(255, ' + g + ', ' + b + '))';
+      'linear-gradient(to right, rgb(0, ' + g + ', ' + b + '), ' +
+      'rgb(255, ' + g + ', ' + b + '))';
     ui.g.style.background =
-       'linear-gradient(to right, rgb(' + r + ', 0, ' + b + '), ' +
-                                 'rgb(' + r + ', 255, ' + b + '))';
+      'linear-gradient(to right, rgb(' + r + ', 0, ' + b + '), ' +
+      'rgb(' + r + ', 255, ' + b + '))';
     ui.b.style.background =
-       'linear-gradient(to right, rgb(' + r + ', ' + g + ', 0), ' +
-                                 'rgb(' + r + ', ' + g + ', 255))';
+      'linear-gradient(to right, rgb(' + r + ', ' + g + ', 0), ' +
+      'rgb(' + r + ', ' + g + ', 255))';
   }
 
-  window.addEventListener('load', function() {
+  window.addEventListener('load', function () {
     // Once the background page has been loaded, it will not unload until this
     // window is closed.
-    chrome.runtime.getBackgroundPage(function(backgroundPage) {
+    chrome.runtime.getBackgroundPage(function (backgroundPage) {
       bg = backgroundPage;
       initializeWindow();
     });
   });
-}());
+} ());
 
-function updateCanInterruptStatusBatch()
-{
-    var usernames = [];
+function updateCanInterruptStatusBatch() {
+  var usernames = [];
 
-    $(".circle-status").each(function (index) {
-        usernames.push($(this).data("username"));
-    });
+  $(".user-card-square").each(function (index) {
+    usernames.push($(this).data("username"));
+  });
 
-    if (usernames.length > 0) {
-        $.unique(usernames);
+  if (usernames.length > 0) {
+    $.unique(usernames);
 
-        updateCanInterruptUserStatus(usernames);
-    }
+    updateCanInterruptUserStatus(usernames);
+  }
 
-    return usernames.length;
+  return usernames.length;
 }
 
 function updateCanInterruptUserStatus(usernames) {
-    $(".circle-status").addClass("grey");
+  $(".user-card-square .pulse-status").addClass("grey");
 
-    $.ajax({
-        type: 'POST',
-        url: 'https://codealike.com/api/v2/public/CanInterruptUser',
-        data: JSON.stringify({ UserNames: usernames }),
-        dataType: 'json',
-        contentType: 'application/json'
-    })
+  $.ajax({
+    type: 'POST',
+    url: 'https://codealike.com/api/v2/public/CanInterruptUser',
+    data: JSON.stringify({ UserNames: usernames }),
+    dataType: 'json',
+    contentType: 'application/json'
+  })
     .done(function (success) {
-        for (var i = 0; i < success.length; i++) {
-            var username = success[i].m_Item1.replace(/\./g, "");
-            var result = success[i].m_Item2;
+      for (var i = 0; i < success.length; i++) {
+        var username = success[i].m_Item1.replace(/\./g, "");
+        var result = success[i].m_Item2;
 
-            defineInterruptionStatusUI(username, result);
-        }
+        defineInterruptionStatusUI(username, result);
+      }
     });
 };
 
-function defineInterruptionStatusUI(username, result)
-{
-    $(".circle_" + username).removeClass("grey");
-    $(".circle_" + username).removeClass("red");
-    $(".circle_" + username).removeClass("darkGreen");
+function defineInterruptionStatusUI(username, result) {
+  $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
+  $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
+  $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
 
-    if (result == "NoActivity") {
-        $(".circle_" + username).addClass("grey");
+  if (result == "NoActivity") {
+    $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
 
-        if ($("#statement")) {
-            $("#statement").html("Yes!");
-        }
-        if ($("#explanation")) {
-            $("#explanation").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
-        }
+    if ($("#statement")) {
+      $("#statement").html("Yes!");
     }
-    else if (result == "CannotInterrupt") {
-        $(".circle_" + username).addClass("red");
-
-        bg.blink1.fadeRgb(164, 3, 0, 250, 0);
-
-        if ($("#statement")) {
-            $("#statement").html("PLEASE, DON'T!");
-        }
-        if ($("#explanation")) {
-            $("#explanation").html("<h3>Please, think twice before interrupting this user. <h3/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
-        }
+    if ($("#explanation")) {
+      $("#explanation").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
     }
-    else {
-        $(".circle_" + username).addClass("darkGreen");
+  }
+  else if (result == "CannotInterrupt") {
+    $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
-        bg.blink1.fadeRgb(0, 159, 0, 250, 0);
+    //bg.blink1.fadeRgb(164, 3, 0, 250, 0);
 
-        if ($("#statement")) {
-            $("#statement").html("Maybe");
-        }
-        if ($("#explanation")) {
-            $("#explanation").html("Even though, this user is coding, it seems that it's not on a coding streak. <br/> Be careful, but we believe you won't get bitten if you interrupt :-D");
-        }
+    if ($("#statement")) {
+      $("#statement").html("PLEASE, DON'T!");
     }
+    if ($("#explanation")) {
+      $("#explanation").html("<h3>Please, think twice before interrupting this user. <h3/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
+    }
+  }
+  else {
+    $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
+
+    //bg.blink1.fadeRgb(0, 159, 0, 250, 0);
+
+    if ($("#statement")) {
+      $("#statement").html("Maybe");
+    }
+    if ($("#explanation")) {
+      $("#explanation").html("Even though, this user is coding, it seems that it's not on a coding streak. <br/> Be careful, but we believe you won't get bitten if you interrupt :-D");
+    }
+  }
 }

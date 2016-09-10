@@ -25,6 +25,10 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
   background-color: #ff5454;
 }
 
+.grey {
+  background-color: #c0c0c0;
+}
+
 .mdl-card--expand
 {
   background-color:ivory;
@@ -35,4 +39,9 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
   height: 15px;
   width: 100%;
   display: block;
+}
+
+.user-card-square.mdl-card {
+  width: 320px;
+  height: 220px;
 }

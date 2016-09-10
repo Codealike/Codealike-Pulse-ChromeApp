@@ -13,8 +13,8 @@
   },
   "permissions": [
     "hid",
-    "https://fonts.googleapis.com/",
-    "https://codealike.com/",
+    "alarms",
+    "<all_urls>",
     {
       "usbDevices": [
         { "vendorId": 10168, "productId": 493 }
