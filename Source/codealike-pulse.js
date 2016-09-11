@@ -56,6 +56,7 @@ $(document).ready(function () {
         if (data.statusText == "OK") {
 
           $.get('assets/templates/user-card.mst', function (template) {
+            data.responseJSON.FullIdentity =data.responseJSON.Identity; 
             data.responseJSON.Identity = data.responseJSON.Identity.replace(/\./g, '');
 
             var html = Mustache.to_html(template, data.responseJSON);
@@ -305,6 +306,7 @@ function updateCanInterruptUserStatus(usernames) {
     contentType: 'application/json'
   })
     .done(function (success) {
+      debugger;
       for (var i = 0; i < success.length; i++) {
         var username = success[i].m_Item1.replace(/\./g, "");
         var result = success[i].m_Item2;
@@ -318,30 +320,25 @@ function defineInterruptionStatusUI(username, result) {
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
-
+  
+  
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
 
-    if ($("#" + username + "-card .mdl-card__supporting-text")) {
-      $("#" + username + "-card .mdl-card__supporting-text").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
-    }
+    $("#" + username + "-card .mdl-card__supporting-text").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
   }
   else if (result == "CannotInterrupt") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
     //bg.blink1.fadeRgb(164, 3, 0, 250, 0);
 
-    if ($(".mdl-card__supporting-text")) {
-      $("#" + username + "-card .mdl-card__supporting-text").html("<strong>Please, think twice before interrupting this user. <strong/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
-    }
+    $("#" + username + "-card .mdl-card__supporting-text").html("<strong>Please, think twice before interrupting this user. <strong/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
   }
   else {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
 
     //bg.blink1.fadeRgb(0, 159, 0, 250, 0);
 
-    if ($(".mdl-card__supporting-text")) {
-      $("#" + username + "-card .mdl-card__supporting-text").html("Even though, this user is coding, it seems that it's not on a coding streak. <br/> Be careful, but we believe you won't get bitten if you interrupt :-D");
-    }
+    $("#" + username + "-card .mdl-card__supporting-text").html("<strong>Please, think twice before interrupting this user. <strong/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
   }
 }

@@ -9,7 +9,7 @@
             It seems this dev is not coding right now.
         </div>
         <div class="mdl-card__actions mdl-card--border">
-            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect override-width" href="https://codealike.com/facts/{{Identity}}" target="_blank">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect override-width" href="https://codealike.com/facts/{{FullIdentity}}" target="_blank">
                 <i class="material-icons">stars</i>
             </a>
             <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect override-width">
