@@ -32,6 +32,26 @@ $(document).ready(function () {
     }
   });
 
+  $(document).on('click', '.delete', function(){
+    deleteUser($(this).data("username"));
+  });
+
+  function deleteUser(username)
+  {
+      $("#add-user").hide();
+      $("#add-user-spinner").show();
+      
+      users = jQuery.grep(users, function(value) {
+        return value != username;
+      });
+
+      chrome.storage.sync.set({"users": users}, function() {
+        $("#" + username + "-card").remove();
+        $("#add-user").show();
+        $("#add-user-spinner").hide();
+      });
+  }
+
   function addUser(username) {
     $("#add-user").hide();
     $("#add-user-spinner").show();
