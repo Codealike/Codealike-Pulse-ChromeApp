@@ -64,7 +64,7 @@ $(document).ready(function () {
             $('#grid-cards').append(html);
 
             var remoteImage, 
-                container = document.querySelector("#" + data.responseJSON.Identity + "-card .mdl-card__title");
+                container = document.querySelector("#" + data.responseJSON.Identity + "-card .avatar");
 
             remoteImage = new RAL.RemoteImage(data.responseJSON.AvatarUri);
             container.appendChild(remoteImage.element);
@@ -293,7 +293,7 @@ function updateCanInterruptStatusBatch() {
 
     updateCanInterruptUserStatus(usernames);
 
-    $(".grey").siblings(".mdl-card__supporting-text").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
+    $(".grey").siblings(".mdl-card__supporting-text").html("It seems there's no recent coding activity.");
   }
 
   return usernames.length;
@@ -326,20 +326,20 @@ function defineInterruptionStatusUI(username, result) {
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
 
-    $("#" + username + "-card .mdl-card__supporting-text").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
+    $("#" + username + "-card .mdl-card__supporting-text").html("It seems there's no recent coding activity.");
   }
   else if (result == "CannotInterrupt") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
     //bg.blink1.fadeRgb(164, 3, 0, 250, 0);
 
-    $("#" + username + "-card .mdl-card__supporting-text").html("<strong>Please, think twice before interrupting this user. <strong/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
+    $("#" + username + "-card .mdl-card__supporting-text").html("<strong>DO NOT INTERRUPT THIS DEV. Seriously.<strong/>");
   }
   else {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
 
     //bg.blink1.fadeRgb(0, 159, 0, 250, 0);
 
-    $("#" + username + "-card .mdl-card__supporting-text").html("<strong>Please, think twice before interrupting this user. <strong/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
+    $("#" + username + "-card .mdl-card__supporting-text").html("<strong>Please, think twice before interrupting this user.<strong/>");
   }
 }

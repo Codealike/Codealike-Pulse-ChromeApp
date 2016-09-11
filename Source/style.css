@@ -50,3 +50,18 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
 {
   min-width: auto !important;
 }
+
+.avatar IMG
+{
+  background-size: 50px 50px !important;
+  height: 50px !important;
+  width: 50px !important;
+  margin: 5px;
+}
+
+.truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
