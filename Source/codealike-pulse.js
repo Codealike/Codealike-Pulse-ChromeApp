@@ -1,12 +1,38 @@
+var users = [];
+
 $(document).ready(function () {
+
+  var snackbarContainer = document.querySelector('#toast-message');
+
+  chrome.storage.sync.get("users", function(val) {
+    users = val.users;
+    
+    if(!users)
+    {
+      users = []
+    }
+
+    $.each(users, function( index, value ) {
+        addUser(value);
+    });
+  });
+
   $("#add-user-spinner").hide();
 
   $("#add-user").click(function () {
-    addUser($("#username").val());
+    var username = $("#username").val();
+
+    if($.inArray(username, users) == -1)
+    {
+      addUser(username);
+    }
+    else
+    {
+      snackbarContainer.MaterialSnackbar.showSnackbar({message: "User already exists in the dashboard."});
+    }
   });
 
   function addUser(username) {
-
     $("#add-user").hide();
     $("#add-user-spinner").show();
 
@@ -45,9 +71,22 @@ $(document).ready(function () {
             RAL.Queue.add(remoteImage);
             RAL.Queue.setMaxConnections(4);
             RAL.Queue.start();
+            
+            if($.inArray(username, users) == -1)
+            {
+              users.push(username);
 
-            $("#add-user").show();
-            $("#add-user-spinner").hide();
+              chrome.storage.sync.set({"users": users}, function() {
+                $("#add-user").show();
+                $("#add-user-spinner").hide();
+              });
+            }
+            else
+            {
+                $("#add-user").show();
+                $("#add-user-spinner").hide();
+            }
+
           });
 
         }
@@ -258,8 +297,6 @@ function updateCanInterruptStatusBatch() {
 }
 
 function updateCanInterruptUserStatus(usernames) {
-  $(".user-card-square .pulse-status").addClass("grey");
-
   $.ajax({
     type: 'POST',
     url: 'https://codealike.com/api/v2/public/CanInterruptUser',
