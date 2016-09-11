@@ -292,6 +292,8 @@ function updateCanInterruptStatusBatch() {
     $.unique(usernames);
 
     updateCanInterruptUserStatus(usernames);
+
+    $(".grey").siblings(".mdl-card__supporting-text").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
   }
 
   return usernames.length;
@@ -306,7 +308,6 @@ function updateCanInterruptUserStatus(usernames) {
     contentType: 'application/json'
   })
     .done(function (success) {
-      debugger;
       for (var i = 0; i < success.length; i++) {
         var username = success[i].m_Item1.replace(/\./g, "");
         var result = success[i].m_Item2;
