@@ -45,3 +45,8 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
   width: 320px;
   height: 220px;
 }
+
+.override-width
+{
+  min-width: auto !important;
+}
