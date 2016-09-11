@@ -322,11 +322,8 @@ function defineInterruptionStatusUI(username, result) {
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
 
-    if ($("#statement")) {
-      $("#statement").html("Yes!");
-    }
-    if ($("#explanation")) {
-      $("#explanation").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
+    if ($("#" + username + "-card .mdl-card__supporting-text")) {
+      $("#" + username + "-card .mdl-card__supporting-text").html("It seems that there's no recent coding activity. <br/> Nevertheless, this user might be working on something else.");
     }
   }
   else if (result == "CannotInterrupt") {
@@ -334,11 +331,8 @@ function defineInterruptionStatusUI(username, result) {
 
     //bg.blink1.fadeRgb(164, 3, 0, 250, 0);
 
-    if ($("#statement")) {
-      $("#statement").html("PLEASE, DON'T!");
-    }
-    if ($("#explanation")) {
-      $("#explanation").html("<h3>Please, think twice before interrupting this user. <h3/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
+    if ($(".mdl-card__supporting-text")) {
+      $("#" + username + "-card .mdl-card__supporting-text").html("<strong>Please, think twice before interrupting this user. <strong/> Interruptions are very expensive for developers, teams and organizations. <br/> Can you wait a bunch of minutes and check this again? Please? Thanks! :-D");
     }
   }
   else {
@@ -346,11 +340,8 @@ function defineInterruptionStatusUI(username, result) {
 
     //bg.blink1.fadeRgb(0, 159, 0, 250, 0);
 
-    if ($("#statement")) {
-      $("#statement").html("Maybe");
-    }
-    if ($("#explanation")) {
-      $("#explanation").html("Even though, this user is coding, it seems that it's not on a coding streak. <br/> Be careful, but we believe you won't get bitten if you interrupt :-D");
+    if ($(".mdl-card__supporting-text")) {
+      $("#" + username + "-card .mdl-card__supporting-text").html("Even though, this user is coding, it seems that it's not on a coding streak. <br/> Be careful, but we believe you won't get bitten if you interrupt :-D");
     }
   }
 }
