@@ -1,4 +1,5 @@
 var users = [];
+var selectedUsername = "";
 
 $(document).ready(function () {
 
@@ -6,6 +7,8 @@ $(document).ready(function () {
 
   $(document).on('click', ".user-selection", function(){
 
+    selectedUsername = "";
+    
     if($(this).hasClass("selected"))
     {
       $(".user-selection").removeClass("selected");
@@ -13,8 +16,15 @@ $(document).ready(function () {
     else
     {
       $(".user-selection").removeClass("selected");
+      selectedUsername = $(this).parent().data("username");
       $(this).addClass("selected");
     }
+  });
+
+  $(document).on('click', ".light-ok", function(){
+
+    $(this).parent().data("username", selectedUsername);
+
   });
 
   var snackbarContainer = document.querySelector('#toast-message');
@@ -238,6 +248,8 @@ var bg = undefined;
       }
     }
 
+    $("#" + deviceId + "-light").remove();
+
     ui.picker.remove(option.index);
 
     if (ui.picker.options.length == 0) {
@@ -261,6 +273,20 @@ var bg = undefined;
     ui.picker.add(option);
     ui.picker.disabled = false;
 
+    $.get('assets/templates/light-card.mst', function (template) {
+
+      var lightData = {
+                        LightID: blink1.deviceId,
+                        Vendor: "blink1",
+                        Version: blink1.version,
+                        Username: ""
+                      };
+
+      var html = Mustache.to_html(template, lightData);
+
+      $("#lights").append(html);
+    });
+
     if (firstDevice) {
       ui.picker.remove(0);
       option.selected = true;
@@ -282,8 +308,17 @@ var bg = undefined;
   }
 
   function switchToDevice(optionIndex) {
-    var deviceId =
-      parseInt(ui.picker.options[optionIndex].id.substring(7));
+    var deviceId = parseInt(ui.picker.options[optionIndex].id.substring(7));
+    var blink1 = new Blink1(deviceId);
+    blink1.connect(function (success) {
+      if (success) {
+        setActiveDevice(blink1);
+      }
+    });
+  }
+
+  function switchToDeviceById(optionIndex) {
+    var deviceId = parseInt(ui.picker.options[optionIndex].id.substring(7));
     var blink1 = new Blink1(deviceId);
     blink1.connect(function (success) {
       if (success) {
@@ -380,11 +415,37 @@ function defineInterruptionStatusUI(username, result) {
   else if (result == "CannotInterrupt") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
-    //bg.blink1.fadeRgb(164, 3, 0, 250, 0);
+    var devices = $('.chip-light').filter(function() { 
+      return $(this).data("username") == username; 
+    });
+
+    if(devices.length > 0)
+    {
+      var blink1 = new Blink1($(devices).data("light"));
+
+      blink1.connect(function (success) {
+        if (success) {
+          blink1.fadeRgb(164, 3, 0, 250, 0);
+        }
+      });
+    }
   }
   else {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
 
-    //bg.blink1.fadeRgb(0, 159, 0, 250, 0);
+    var devices = $('.chip-light').filter(function() { 
+      return $(this).data("username") == username; 
+    });
+
+    if(devices.length > 0)
+    {
+      var blink1 = new Blink1($(devices).data("light"));
+
+      blink1.connect(function (success) {
+        if (success) {
+        blink1.fadeRgb(0, 159, 0, 250, 0);
+        }
+      });
+    }
   }
 }
