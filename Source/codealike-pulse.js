@@ -32,7 +32,18 @@ $(document).ready(function () {
 
     blink1.connect(function (success) {
       if (success) {
-        blink1.fadeRgb(0, 0, 0, 0, 0);
+        if($("#" + selectedUsername + "-card .user-card-square .pulse-status").hasClass("red"))
+        {
+          blink1.fadeRgb(164, 3, 0, 250, 0);
+        }
+        else if($("#" + selectedUsername + "-card .user-card-square .pulse-status").hasClass("darkGreen"))
+        {
+          blink1.fadeRgb(0, 159, 0, 250, 0);
+        }
+        else
+        {
+          blink1.fadeRgb(0, 0, 0, 0, 0);
+        }
       }
     });
 
@@ -389,8 +400,6 @@ var bg = undefined;
   }
 
   window.addEventListener('load', function () {
-    // Once the background page has been loaded, it will not unload until this
-    // window is closed.
     chrome.runtime.getBackgroundPage(function (backgroundPage) {
       bg = backgroundPage;
       initializeWindow();
