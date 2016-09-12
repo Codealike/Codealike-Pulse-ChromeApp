@@ -2,6 +2,8 @@ var users = [];
 
 $(document).ready(function () {
 
+  $("#offline-mode").hide();
+
   var snackbarContainer = document.querySelector('#toast-message');
 
   chrome.storage.sync.get("users", function(val) {
@@ -108,11 +110,15 @@ $(document).ready(function () {
                 $("#add-user-spinner").hide();
             }
 
+            $("#online-mode").show();
+            $("#offline-mode").hide();
           });
 
         }
         else {
           console.log("Receiving activity from Server FAILED");
+          $("#online-mode").hide();
+          $("#offline-mode").show();
           $("#add-user").show();
           $("#add-user-spinner").hide();
           return { result: "failed" };
@@ -330,8 +336,15 @@ function updateCanInterruptUserStatus(usernames) {
         var username = success[i].m_Item1.replace(/\./g, "");
         var result = success[i].m_Item2;
 
+        $("#online-mode").show();
+        $("#offline-mode").hide();
+
         defineInterruptionStatusUI(username, result);
       }
+    })
+    .fail(function(){
+        $("#online-mode").hide();
+        $("#offline-mode").show();
     });
 };
 

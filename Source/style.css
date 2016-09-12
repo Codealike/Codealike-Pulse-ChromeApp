@@ -31,7 +31,7 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
 
 .mdl-card--expand
 {
-  background-color:ivory;
+  background-color:white;
 }
 
 .pulse-status
@@ -56,7 +56,7 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
   background-size: 50px 50px !important;
   height: 50px !important;
   width: 50px !important;
-  margin: 5px;
+  margin: 8px;
 }
 
 .truncate {
@@ -74,4 +74,20 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
 .white
 {
   background-color: white !important;
+}
+
+.avatar-rounded IMG {
+    position: relative;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 0 0 2px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 0 0 3px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0,0,0,.2);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #999, 0 2px 5px 4px rgba(0,0,0,.2);
+}
+
+.darkGrey
+{
+  background-color: #233239;
+  color: white;
 }
