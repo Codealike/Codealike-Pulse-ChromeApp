@@ -4,6 +4,19 @@ $(document).ready(function () {
 
   $("#offline-mode").hide();
 
+  $(document).on('click', ".user-selection", function(){
+
+    if($(this).hasClass("selected"))
+    {
+      $(".user-selection").removeClass("selected");
+    }
+    else
+    {
+      $(".user-selection").removeClass("selected");
+      $(this).addClass("selected");
+    }
+  });
+
   var snackbarContainer = document.querySelector('#toast-message');
 
   chrome.storage.sync.get("users", function(val) {
@@ -206,6 +219,7 @@ var bg = undefined;
 
   function onDeviceRemoved(deviceId) {
     var option = ui.picker.options.namedItem('device-' + deviceId);
+
     if (!option) {
       return;
     }
@@ -214,14 +228,18 @@ var bg = undefined;
       bg.blink1.disconnect(function () { });
       bg.blink1 = undefined;
       enableControls(false);
+
       if (option.previousSibling) {
         option.previousSibling.selected = true;
       }
+
       if (option.nextSibling) {
         option.nextSibling.selected = true;
       }
     }
+
     ui.picker.remove(option.index);
+
     if (ui.picker.options.length == 0) {
       var empty = document.createElement('option');
       empty.text = 'No devices found.';
@@ -237,10 +255,12 @@ var bg = undefined;
   function addNewDevice(blink1) {
     var firstDevice = ui.picker.options[0].id == 'empty';
     var option = document.createElement('option');
+
     option.text = blink1.deviceId + ' (version ' + blink1.version + ')';
     option.id = 'device-' + blink1.deviceId;
     ui.picker.add(option);
     ui.picker.disabled = false;
+
     if (firstDevice) {
       ui.picker.remove(0);
       option.selected = true;

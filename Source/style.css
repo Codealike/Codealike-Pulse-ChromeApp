@@ -29,11 +29,6 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
   background-color: #c0c0c0;
 }
 
-.mdl-card--expand
-{
-  background-color:white;
-}
-
 .pulse-status
 {
   height: 15px;
@@ -90,4 +85,20 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
 {
   background-color: #233239;
   color: white;
+}
+
+.font-size-50
+{
+  font-size: 50px !important;
+}
+
+.hand
+{
+  cursor: pointer;
+}
+
+.selected
+{
+  background-color:#170000 !important;
+  color: white !important;
 }
