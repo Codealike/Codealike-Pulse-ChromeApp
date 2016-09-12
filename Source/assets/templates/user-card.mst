@@ -9,13 +9,13 @@
             It seems this dev is not coding right now.
         </div>
         <div class="mdl-card__actions mdl-card--border">
-            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect override-width" href="https://codealike.com/facts/{{FullIdentity}}" target="_blank">
+            <a class="mdl-button mdl-js-button mdl-button--icon" href="https://codealike.com/facts/{{FullIdentity}}" target="_blank">
                 <i class="material-icons">stars</i>
             </a>
-            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect override-width">
+            <a class="mdl-button mdl-js-button mdl-button--icon">
                 <i class="material-icons">highlight</i>
             </a>
-            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect override-width delete" data-username="{{Identity}}">
+            <a class="mdl-button mdl-js-button mdl-button--icon delete" data-username="{{Identity}}">
                 <i class="material-icons">delete</i>
             </a>
         </div>
