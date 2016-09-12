@@ -1,44 +1,85 @@
 var users = [];
 var selectedUsername = "";
+var selectedDisplayName = "";
 
 $(document).ready(function () {
 
   $("#offline-mode").hide();
 
-  $(document).on('click', ".user-selection", function(){
+  $(document).on('click', ".user-selection", function () {
 
     selectedUsername = "";
-    
-    if($(this).hasClass("selected"))
-    {
+    selectedDisplayName = "";
+
+    if ($(this).hasClass("selected")) {
       $(".user-selection").removeClass("selected");
+      $(".light-ok").hide();
     }
-    else
-    {
+    else {
       $(".user-selection").removeClass("selected");
       selectedUsername = $(this).parent().data("username");
+      selectedDisplayName = $(this).parent().data("displayname");
+      $(".light-ok").show();
       $(this).addClass("selected");
     }
   });
 
-  $(document).on('click', ".light-ok", function(){
+  $(document).on('click', ".light-ok", function () {
 
     $(this).parent().data("username", selectedUsername);
 
+    var blink1 = new Blink1($(this).parent().data("light"));
+
+    blink1.connect(function (success) {
+      if (success) {
+        blink1.fadeRgb(0, 0, 0, 0, 0);
+      }
+    });
+
+    $(this).parent().find(".username").html("&nbsp; <strong>" + selectedDisplayName + "</strong>");
+  });
+
+  $(document).on('click', ".light-locate", function () {
+    var isSelected = $(this).data("selected");
+    var values0 = { r: 0, g: 0, b: 0, speed: 500, led: 0 };
+    var values1 = { r: 0, g: 0, b: 0, speed: 1000, led: 0 };
+    var values2 = { r: 0, g: 0, b: 0, speed: 1500, led: 0 };
+
+    if (isSelected == 1) {
+      isSelected = 0;
+    }
+    else {
+      values0 = { r: 0, g: 250, b: 0, speed: 250, led: 0 };
+      values1 = { r: 120, g: 0, b: 120, speed: 500, led: 1 };
+      values2 = { r: 0, g: 120, b: 120, speed: 1000, led: 2 };
+
+      isSelected = 1;
+    }
+
+    var blink1 = new Blink1($(this).parent().data("light"));
+
+    blink1.connect(function (success) {
+      if (success) {
+        blink1.fadeRgb(values0.r, values0.g, values0.b, values0.speed, values0.led);
+        blink1.fadeRgb(values1.r, values1.g, values1.b, values1.speed, values1.led);
+        blink1.fadeRgb(values2.r, values2.g, values2.b, values2.speed, values2.led);
+      }
+    });
+
+    $(this).data("selected", isSelected);
   });
 
   var snackbarContainer = document.querySelector('#toast-message');
 
-  chrome.storage.sync.get("users", function(val) {
+  chrome.storage.sync.get("users", function (val) {
     users = val.users;
-    
-    if(!users)
-    {
+
+    if (!users) {
       users = []
     }
 
-    $.each(users, function( index, value ) {
-        addUser(value);
+    $.each(users, function (index, value) {
+      addUser(value);
     });
   });
 
@@ -47,34 +88,31 @@ $(document).ready(function () {
   $("#add-user").click(function () {
     var username = $("#username").val();
 
-    if($.inArray(username, users) == -1)
-    {
+    if ($.inArray(username, users) == -1) {
       addUser(username);
     }
-    else
-    {
-      snackbarContainer.MaterialSnackbar.showSnackbar({message: "User already exists in the dashboard."});
+    else {
+      snackbarContainer.MaterialSnackbar.showSnackbar({ message: "User already exists in the dashboard." });
     }
   });
 
-  $(document).on('click', '.delete', function(){
+  $(document).on('click', '.delete', function () {
     deleteUser($(this).data("username"));
   });
 
-  function deleteUser(username)
-  {
-      $("#add-user").hide();
-      $("#add-user-spinner").show();
-      
-      users = jQuery.grep(users, function(value) {
-        return value != username;
-      });
+  function deleteUser(username) {
+    $("#add-user").hide();
+    $("#add-user-spinner").show();
 
-      chrome.storage.sync.set({"users": users}, function() {
-        $("#" + username + "-card").remove();
-        $("#add-user").show();
-        $("#add-user-spinner").hide();
-      });
+    users = jQuery.grep(users, function (value) {
+      return value != username;
+    });
+
+    chrome.storage.sync.set({ "users": users }, function () {
+      $("#" + username + "-card").remove();
+      $("#add-user").show();
+      $("#add-user-spinner").hide();
+    });
   }
 
   function addUser(username) {
@@ -101,15 +139,15 @@ $(document).ready(function () {
         if (data.statusText == "OK") {
 
           $.get('assets/templates/user-card.mst', function (template) {
-            data.responseJSON.FullIdentity =data.responseJSON.Identity; 
+            data.responseJSON.FullIdentity = data.responseJSON.Identity;
             data.responseJSON.Identity = data.responseJSON.Identity.replace(/\./g, '');
 
             var html = Mustache.to_html(template, data.responseJSON);
-            
+
             $('#grid-cards').append(html);
 
-            var remoteImage, 
-                container = document.querySelector("#" + data.responseJSON.Identity + "-card .avatar");
+            var remoteImage,
+              container = document.querySelector("#" + data.responseJSON.Identity + "-card .avatar");
 
             remoteImage = new RAL.RemoteImage(data.responseJSON.AvatarUri);
             container.appendChild(remoteImage.element);
@@ -117,20 +155,18 @@ $(document).ready(function () {
             RAL.Queue.add(remoteImage);
             RAL.Queue.setMaxConnections(4);
             RAL.Queue.start();
-            
-            if($.inArray(username, users) == -1)
-            {
+
+            if ($.inArray(username, users) == -1) {
               users.push(username);
 
-              chrome.storage.sync.set({"users": users}, function() {
+              chrome.storage.sync.set({ "users": users }, function () {
                 $("#add-user").show();
                 $("#add-user-spinner").hide();
               });
             }
-            else
-            {
-                $("#add-user").show();
-                $("#add-user-spinner").hide();
+            else {
+              $("#add-user").show();
+              $("#add-user-spinner").hide();
             }
 
             $("#online-mode").show();
@@ -151,7 +187,7 @@ $(document).ready(function () {
   }
 });
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
+chrome.alarms.onAlarm.addListener(function (alarm) {
   updateCanInterruptStatusBatch();
 });
 
@@ -276,11 +312,11 @@ var bg = undefined;
     $.get('assets/templates/light-card.mst', function (template) {
 
       var lightData = {
-                        LightID: blink1.deviceId,
-                        Vendor: "blink1",
-                        Version: blink1.version,
-                        Username: ""
-                      };
+        LightID: blink1.deviceId,
+        Vendor: "blink1",
+        Version: blink1.version,
+        Username: ""
+      };
 
       var html = Mustache.to_html(template, lightData);
 
@@ -387,19 +423,30 @@ function updateCanInterruptUserStatus(usernames) {
     contentType: 'application/json'
   })
     .done(function (success) {
-      for (var i = 0; i < success.length; i++) {
-        var username = success[i].m_Item1.replace(/\./g, "");
-        var result = success[i].m_Item2;
 
-        $("#online-mode").show();
-        $("#offline-mode").hide();
+      $("#online-mode").show();
+      $("#offline-mode").hide();
 
-        defineInterruptionStatusUI(username, result);
-      }
+      var allUsersResult = $.map(users, function (user) {
+        var exists = false;
+        var value = "NoActivity"
+
+        $.each(success, function (index, e) {
+          var username = e.m_Item1.replace(/\./g, "");
+          var result = e.m_Item2;
+
+          if (user == username) {
+            value = result;
+            return false;
+          }
+        });
+
+        defineInterruptionStatusUI(user, value);
+      });
     })
-    .fail(function(){
-        $("#online-mode").hide();
-        $("#offline-mode").show();
+    .fail(function () {
+      $("#online-mode").hide();
+      $("#offline-mode").show();
     });
 };
 
@@ -407,20 +454,31 @@ function defineInterruptionStatusUI(username, result) {
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
-  
-  
+
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
+    var devices = $('.chip-light').filter(function () {
+      return $(this).data("username") == username;
+    });
+
+    if (devices.length > 0) {
+      var blink1 = new Blink1($(devices).data("light"));
+
+      blink1.connect(function (success) {
+        if (success) {
+          blink1.fadeRgb(0, 0, 0, 0, 0);
+        }
+      });
+    }
   }
   else if (result == "CannotInterrupt") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
-    var devices = $('.chip-light').filter(function() { 
-      return $(this).data("username") == username; 
+    var devices = $('.chip-light').filter(function () {
+      return $(this).data("username") == username;
     });
 
-    if(devices.length > 0)
-    {
+    if (devices.length > 0) {
       var blink1 = new Blink1($(devices).data("light"));
 
       blink1.connect(function (success) {
@@ -433,17 +491,16 @@ function defineInterruptionStatusUI(username, result) {
   else {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
 
-    var devices = $('.chip-light').filter(function() { 
-      return $(this).data("username") == username; 
+    var devices = $('.chip-light').filter(function () {
+      return $(this).data("username") == username;
     });
 
-    if(devices.length > 0)
-    {
+    if (devices.length > 0) {
       var blink1 = new Blink1($(devices).data("light"));
 
       blink1.connect(function (success) {
         if (success) {
-        blink1.fadeRgb(0, 159, 0, 250, 0);
+          blink1.fadeRgb(0, 159, 0, 250, 0);
         }
       });
     }

@@ -1,5 +1,9 @@
 <span id="{{LightID}}-light" class="mdl-chip mdl-chip--contact mdl-chip--deletable chip-light" data-light="{{LightID}}" data-username="{{Username}}" data-vendor="{{Vendor}}">
-    <i class="mdl-chip__contact material-icons">highlight</i>
+    <i class="mdl-chip__contact material-icons">lightbulb_outline</i>
     <span class="mdl-chip__text">{{Vendor}} {{LightID}}</span>
+    <span class="mdl-chip__text username"></span>
     <a id="{{LightID}}-light-ok" href="#" class="mdl-chip__action light-ok"><i class="material-icons">check_circle</i></a>
+
+    <a id="{{LightID}}-light-locate" href="#" class="mdl-chip__action light-locate" data-selected="0"><i class="material-icons">location_searching</i></a>
+    data-selected="0"
 </span>
