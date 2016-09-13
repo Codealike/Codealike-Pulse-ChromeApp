@@ -1,10 +1,28 @@
 var users = [];
 var selectedUsername = "";
 var selectedDisplayName = "";
+var apiToken = "";
+var apiOk = false;
 
 $(document).ready(function () {
 
   $("#offline-mode").hide();
+  $("#onboarding").hide();
+  var snackbarContainer = document.querySelector('#toast-message');
+
+  chrome.storage.sync.get("token", function (val) {
+ 
+    if($.isEmptyObject(val))
+    {
+      $("#onboarding").show();
+      $("#offline-mode").hide();
+      $("#online-mode").hide();
+    }
+    else
+    {
+      setToken(val.token);
+    }
+  });
 
   $(document).on('click', ".user-selection", function () {
 
@@ -24,6 +42,28 @@ $(document).ready(function () {
     }
   });
 
+  $("#codealike-api-token").change(function(e){
+    setToken($("#codealike-api-token").val());
+  });
+
+  $("#onboarding-ok").click(function(e){
+    setToken($("#onboarding-token").val());
+  });
+
+  function setToken(token)
+  {
+    apiToken = $.trim(token);
+
+    chrome.storage.sync.set({ "token": apiToken }, function () {
+      $("#codealike-api-token").val(apiToken);
+      $("#onboarding-token").val(apiToken);
+    });
+
+    apiOk = true;
+
+    getUsers();
+    updateCanInterruptStatusBatch();    
+  }
   $(document).on('click', ".light-ok", function () {
 
     $(this).parent().data("username", selectedUsername);
@@ -80,19 +120,21 @@ $(document).ready(function () {
     $(this).data("selected", isSelected);
   });
 
-  var snackbarContainer = document.querySelector('#toast-message');
+  function getUsers()
+  {
+    chrome.storage.sync.get("users", function (val) {
+      users = val.users;
 
-  chrome.storage.sync.get("users", function (val) {
-    users = val.users;
+      if (!users) {
+        users = []
+      }
 
-    if (!users) {
-      users = []
-    }
-
-    $.each(users, function (index, value) {
-      addUser(value);
+      $('#grid-cards').html("");
+      $.each(users, function (index, value) {
+        addUser(value);
+      });
     });
-  });
+  }
 
   $("#add-user-spinner").hide();
 
@@ -130,8 +172,7 @@ $(document).ready(function () {
     $("#add-user").hide();
     $("#add-user-spinner").show();
 
-    var userData = "soke/c12060a3-1ace-450a-b4ae-1eaec2ef4a31";
-    var tokenValues = userData.split("/");
+    var tokenValues = apiToken.split("/");
     var identity = tokenValues[0];
     var token = tokenValues[1];
 
@@ -167,6 +208,10 @@ $(document).ready(function () {
             RAL.Queue.setMaxConnections(4);
             RAL.Queue.start();
 
+            $("#online-mode").show();
+            $("#offline-mode").hide();
+            $("#onboarding").hide();
+
             if ($.inArray(username, users) == -1) {
               users.push(username);
 
@@ -179,19 +224,30 @@ $(document).ready(function () {
               $("#add-user").show();
               $("#add-user-spinner").hide();
             }
-
-            $("#online-mode").show();
-            $("#offline-mode").hide();
           });
 
         }
         else {
-          console.log("Receiving activity from Server FAILED");
-          $("#online-mode").hide();
-          $("#offline-mode").show();
-          $("#add-user").show();
-          $("#add-user-spinner").hide();
-          return { result: "failed" };
+          if(data.status == 401)
+          {
+            console.log("Query to Server is forbidden. Bad token.");
+            $("#online-mode").hide();
+            $("#offline-mode").hide();
+            $("#onboarding").show();
+            $("#add-user").show();
+            $("#add-user-spinner").hide();
+            return { result: "failed" };
+          }
+          else
+          {
+            console.log("Receiving activity from Server FAILED");
+            $("#online-mode").hide();
+            $("#offline-mode").show();
+            $("#onboarding").hide();
+            $("#add-user").show();
+            $("#add-user-spinner").hide();
+            return { result: "failed" };
+          }
         }
       }
     });
@@ -199,7 +255,10 @@ $(document).ready(function () {
 });
 
 chrome.alarms.onAlarm.addListener(function (alarm) {
-  updateCanInterruptStatusBatch();
+  if (apiOk)
+  {
+    updateCanInterruptStatusBatch();
+  }
 });
 
 var bg = undefined;

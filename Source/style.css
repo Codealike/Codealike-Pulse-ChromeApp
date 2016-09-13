@@ -87,6 +87,12 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
   color: white;
 }
 
+.darkOrange
+{
+  background-color: darkorange;
+  color: white;
+}
+
 .font-size-50
 {
   font-size: 50px !important;
