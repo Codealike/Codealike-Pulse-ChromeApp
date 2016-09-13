@@ -467,19 +467,13 @@ var bg = undefined;
 } ());
 
 function updateCanInterruptStatusBatch() {
-  var usernames = [];
+  if (users.length > 0) {
+    $.unique(users);
 
-  $(".user-card-square").each(function (index) {
-    usernames.push($(this).data("username"));
-  });
-
-  if (usernames.length > 0) {
-    $.unique(usernames);
-
-    updateCanInterruptUserStatus(usernames);
+    updateCanInterruptUserStatus(users);
   }
 
-  return usernames.length;
+  return users.length;
 }
 
 function updateCanInterruptUserStatus(usernames) {
@@ -500,7 +494,7 @@ function updateCanInterruptUserStatus(usernames) {
         var value = "NoActivity"
 
         $.each(success, function (index, e) {
-          var username = e.m_Item1.replace(/\./g, "");
+          var username = e.m_Item1;
           var result = e.m_Item2;
 
           if (user == username) {
@@ -519,6 +513,7 @@ function updateCanInterruptUserStatus(usernames) {
 };
 
 function defineInterruptionStatusUI(username, result) {
+  username = username.replace(/\./g, '');
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
