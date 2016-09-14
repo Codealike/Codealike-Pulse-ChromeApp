@@ -127,18 +127,17 @@ $(document).ready(function () {
 
       if (!users) {
         users = []
+      }
 
         $('#grid-cards').html("");
         $.each(users, function (index, value) {
           addUser(value);
         });
-      }
-      else
-      {
+
         $("#online-mode").show();
         $("#offline-mode").hide();
         $("#onboarding").hide();
-      }
+
     });
   }
 
@@ -523,6 +522,8 @@ function defineInterruptionStatusUI(username, result) {
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
+
+
 
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
