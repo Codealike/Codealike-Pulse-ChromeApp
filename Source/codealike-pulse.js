@@ -242,6 +242,15 @@ $(document).ready(function () {
             $("#add-user").show();
             $("#add-user-spinner").hide();
             return { result: "failed" };
+          } else if(data.status == 404)
+          {
+            console.log("User does not exist.");
+
+            snackbarContainer.MaterialSnackbar.showSnackbar({ message: "User does not exist." });
+
+            $("#add-user").show();
+            $("#add-user-spinner").hide();
+            return { result: "failed" };
           }
           else
           {
