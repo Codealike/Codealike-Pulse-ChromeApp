@@ -127,12 +127,18 @@ $(document).ready(function () {
 
       if (!users) {
         users = []
-      }
 
-      $('#grid-cards').html("");
-      $.each(users, function (index, value) {
-        addUser(value);
-      });
+        $('#grid-cards').html("");
+        $.each(users, function (index, value) {
+          addUser(value);
+        });
+      }
+      else
+      {
+        $("#online-mode").show();
+        $("#offline-mode").hide();
+        $("#onboarding").hide();
+      }
     });
   }
 
