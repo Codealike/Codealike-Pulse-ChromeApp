@@ -143,16 +143,36 @@ $(document).ready(function () {
 
   $("#add-user-spinner").hide();
 
+  $("#username").keydown(function(e){
+      if(e.keyCode==13)
+      {
+        validateAddUser();
+      }
+    });
+
   $("#add-user").click(function () {
-    var username = $("#username").val();
+      validateAddUser();
+  });
+
+  function validateAddUser()
+  {
+    if(!$("#username").val().trim())
+    {
+      snackbarContainer.MaterialSnackbar.showSnackbar({ message: "You should enter a valid Codealike username." });
+      return false;
+    }
+
+    var username = $("#username").val().trim();
 
     if ($.inArray(username, users) == -1) {
       addUser(username);
+      $("#username").val("")
+      snackbarContainer.MaterialSnackbar.showSnackbar({ message: "The user " + username + " was added to dashboard." });
     }
     else {
       snackbarContainer.MaterialSnackbar.showSnackbar({ message: "User already exists in the dashboard." });
     }
-  });
+  }
 
   $(document).on('click', '.delete', function () {
     deleteUser($(this).data("username"));
