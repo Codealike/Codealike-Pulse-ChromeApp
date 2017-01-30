@@ -64,31 +64,36 @@ $(document).ready(function () {
     getUsers();
     updateCanInterruptStatusBatch();    
   }
+
   $(document).on('click', ".light-ok", function () {
-
-    $(this).parent().data("username", selectedUsername);
-
-    var blink1 = new Blink1($(this).parent().data("light"));
-
-    blink1.connect(function (success) {
-      if (success) {
-        if($("#" + selectedUsername + "-card .user-card-square .pulse-status").hasClass("red"))
-        {
-          blink1.fadeRgb(164, 3, 0, 250, 0);
-        }
-        else if($("#" + selectedUsername + "-card .user-card-square .pulse-status").hasClass("darkGreen"))
-        {
-          blink1.fadeRgb(0, 159, 0, 250, 0);
-        }
-        else
-        {
-          blink1.fadeRgb(0, 0, 0, 0, 0);
-        }
-      }
-    });
-
-    $(this).parent().find(".username").html("&nbsp; <strong>" + selectedDisplayName + "</strong>");
+    selectLight(this, selectedUsername, selectedDisplayName);
   });
+
+  function selectLight(control, username, displayName)
+  {
+      $(control).parent().data("username", username);
+
+      var blink1 = new Blink1($(control).parent().data("light"));
+
+      blink1.connect(function (success) {
+        if (success) {
+          if($("#" + username + "-card .user-card-square .pulse-status").hasClass("red"))
+          {
+            blink1.fadeRgb(164, 3, 0, 250, 0);
+          }
+          else if($("#" + username + "-card .user-card-square .pulse-status").hasClass("darkGreen"))
+          {
+            blink1.fadeRgb(0, 159, 0, 250, 0);
+          }
+          else
+          {
+            blink1.fadeRgb(0, 0, 0, 0, 0);
+          }
+        }
+      });
+
+      $(control).parent().find(".username").html("&nbsp; <strong>" + displayName + "</strong>");
+  }
 
   $(document).on('click', ".light-locate", function () {
     var isSelected = $(this).data("selected");
@@ -214,11 +219,13 @@ $(document).ready(function () {
         request.setRequestHeader("X-Api-Token", token);
       },
       complete: function (data, textStatus, jqXHR) {
-        if (data.statusText == "OK") {
+        if (data.statusText == "success") {
 
           $.get('assets/templates/user-card.mst', function (template) {
             data.responseJSON.FullIdentity = data.responseJSON.Identity;
             data.responseJSON.Identity = data.responseJSON.Identity.replace(/\./g, '');
+
+            data.responseJSON.IsYou = (data.responseJSON.Identity == apiToken.split("/")[0]);
 
             var html = Mustache.to_html(template, data.responseJSON);
 
