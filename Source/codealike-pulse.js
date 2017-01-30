@@ -365,6 +365,18 @@ var bg = undefined;
       var html = Mustache.to_html(template, lightData);
 
       $("#lights").append(html);
+
+      /*If it's first device, assign to current user if it's tracked.*/
+      // Is this the first light?
+      if($("#lights").children().length == 1)
+      {
+        // Is current user being tracked?
+        if($("#" + apiToken.split("/")[0] + "-card").length == 1)
+        {
+          // Select first light for user.
+          selectLight($("#" + lightData.LightID + "-light"), apiToken.split("/")[0], selectedDisplayName);
+        }
+      }
     });
 
   }
