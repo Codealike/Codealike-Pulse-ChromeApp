@@ -71,12 +71,12 @@ $(document).ready(function () {
 
   function selectLight(control, username, displayName)
   {
-      $(control).parent().data("username", username);
-
       var blink1 = new Blink1($(control).parent().data("light"));
 
       blink1.connect(function (success) {
         if (success) {
+          $(control).parent().data("username", username);
+
           if($("#" + username + "-card .user-card-square .pulse-status").hasClass("red"))
           {
             blink1.fadeRgb(164, 3, 0, 250, 0);
@@ -92,7 +92,7 @@ $(document).ready(function () {
         }
       });
 
-      $(control).parent().find(".username").html("&nbsp; <strong>" + displayName + "</strong>");
+    $(control).parent().find(".username").html("&nbsp; <strong>" + displayName + "</strong>");
   }
 
   $(document).on('click', ".light-locate", function () {
@@ -245,6 +245,24 @@ $(document).ready(function () {
             $("#offline-mode").hide();
             $("#onboarding").hide();
 
+            // IF is there's any light connected
+            if($("#lights").children().length > 0)
+            {
+              // IF this user is the authenticated user.
+              if($("#" + apiToken.split("/")[0] + "-card").length == 1 && apiToken.split("/")[0] == username)
+              {
+                var firstLight = $(".chip-light").first();
+
+                if(firstLight != undefined)
+                {
+                  var lightID = $(firstLight).data("light");
+
+                  // Assign first light to this user.
+                  selectLight($("#" + lightID + "-light .light-ok"), username, data.responseJSON.DisplayName);
+                }
+              }
+            }
+
             if ($.inArray(username, users) == -1) {
               users.push(username);
 
@@ -294,6 +312,7 @@ $(document).ready(function () {
       }
     });
   }
+
 });
 
 chrome.alarms.onAlarm.addListener(function (alarm) {
@@ -366,15 +385,16 @@ var bg = undefined;
 
       $("#lights").append(html);
 
-      /*If it's first device, assign to current user if it's tracked.*/
-      // Is this the first light?
-      if($("#lights").children().length == 1)
+      var authenticatedUser = apiToken.split("/")[0];
+
+      // IF the authenticated user exists among the users
+      if($("#grid-cards [data-username=" + authenticatedUser + "]").children().length > 0)
       {
-        // Is current user being tracked?
-        if($("#" + apiToken.split("/")[0] + "-card").length == 1)
+        // IF the authenticated user has no other light THEN assign first light to that user.
+        if($(".chip-light [data-username=" + authenticatedUser + "]").length == 0)
         {
-          // Select first light for user.
-          selectLight($("#" + lightData.LightID + "-light"), apiToken.split("/")[0], selectedDisplayName);
+            // Select first light for user.
+            selectLight($("#" + blink1.deviceId + "-light .light-ok"), authenticatedUser, "PLACEHOLDER");
         }
       }
     });
