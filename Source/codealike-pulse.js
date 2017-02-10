@@ -69,31 +69,6 @@ $(document).ready(function () {
     selectLight(this, selectedUsername, selectedDisplayName);
   });
 
-  function selectLight(control, username, displayName)
-  {
-      var blink1 = new Blink1($(control).parent().data("light"));
-
-      blink1.connect(function (success) {
-        if (success) {
-          $(control).parent().data("username", username);
-
-          if($("#" + username + "-card .user-card-square .pulse-status").hasClass("red"))
-          {
-            blink1.fadeRgb(164, 3, 0, 250, 0);
-          }
-          else if($("#" + username + "-card .user-card-square .pulse-status").hasClass("darkGreen"))
-          {
-            blink1.fadeRgb(0, 159, 0, 250, 0);
-          }
-          else
-          {
-            blink1.fadeRgb(0, 0, 0, 0, 0);
-          }
-        }
-      });
-
-    $(control).parent().find(".username").html("&nbsp; <strong>" + displayName + "</strong>");
-  }
 
   $(document).on('click', ".light-locate", function () {
     var isSelected = $(this).data("selected");
@@ -170,12 +145,31 @@ $(document).ready(function () {
     var username = $("#username").val().trim();
 
     if ($.inArray(username, users) == -1) {
-      addUser(username);
-      $("#username").val("")
-      snackbarContainer.MaterialSnackbar.showSnackbar({ message: "The user " + username + " was added to dashboard." });
+      addUser(username, showMessage);
+      $("#username").val("");
     }
     else {
       snackbarContainer.MaterialSnackbar.showSnackbar({ message: "User already exists in the dashboard." });
+    }
+  }
+
+  function showMessage(result, username)
+  {
+    switch (result) {
+      case "404":
+        snackbarContainer.MaterialSnackbar.showSnackbar({ message: "User does not exist. Did you have any typo?" });
+        break;
+    
+      case "404":
+        snackbarContainer.MaterialSnackbar.showSnackbar({ message: "User " + username + " was added successfuly to the dashboard." });
+        break;
+
+      case "failed":
+        snackbarContainer.MaterialSnackbar.showSnackbar({ message: "Something failed. Got Internet? Got power? Try again?" });
+        break;
+
+      default:
+        break;
     }
   }
 
@@ -199,7 +193,7 @@ $(document).ready(function () {
     });
   }
 
-  function addUser(username) {
+  function addUser(username, callback) {
     $("#add-user").hide();
     $("#add-user-spinner").show();
 
@@ -276,7 +270,11 @@ $(document).ready(function () {
               $("#add-user-spinner").hide();
             }
           });
+          
+          if(callback)
+            callback("200", username);
 
+          return { result: "200" };
         }
         else {
           if(data.status == 401)
@@ -287,16 +285,22 @@ $(document).ready(function () {
             $("#onboarding").show();
             $("#add-user").show();
             $("#add-user-spinner").hide();
+
+            if(callback)
+              callback("failed");
+
             return { result: "failed" };
           } else if(data.status == 404)
           {
             console.log("User does not exist.");
 
-            snackbarContainer.MaterialSnackbar.showSnackbar({ message: "User does not exist." });
-
             $("#add-user").show();
             $("#add-user-spinner").hide();
-            return { result: "failed" };
+
+            if(callback)
+              callback("404");
+
+            return { result: "404" };
           }
           else
           {
@@ -306,6 +310,10 @@ $(document).ready(function () {
             $("#onboarding").hide();
             $("#add-user").show();
             $("#add-user-spinner").hide();
+
+            if(callback)
+              callback("failed");
+
             return { result: "failed" };
           }
         }
@@ -315,6 +323,31 @@ $(document).ready(function () {
 
 });
 
+  function selectLight(control, username, displayName)
+  {
+      var blink1 = new Blink1($(control).parent().data("light"));
+
+      blink1.connect(function (success) {
+        if (success) {
+          $(control).parent().attr("data-username", username);
+
+          if($("#" + username + "-card .user-card-square .pulse-status").hasClass("red"))
+          {
+            blink1.fadeRgb(164, 3, 0, 250, 0);
+          }
+          else if($("#" + username + "-card .user-card-square .pulse-status").hasClass("darkGreen"))
+          {
+            blink1.fadeRgb(0, 159, 0, 250, 0);
+          }
+          else
+          {
+            blink1.fadeRgb(0, 0, 0, 0, 0);
+          }
+        }
+      });
+
+    $(control).parent().find(".username").html("&nbsp; <strong>" + displayName + "</strong>");
+  }
 chrome.alarms.onAlarm.addListener(function (alarm) {
   if (apiOk)
   {
@@ -388,13 +421,14 @@ var bg = undefined;
       var authenticatedUser = apiToken.split("/")[0];
 
       // IF the authenticated user exists among the users
-      if($("#grid-cards [data-username=" + authenticatedUser + "]").children().length > 0)
+      if($(".mdl-card[data-username=" + authenticatedUser + "]").children().length > 0)
       {
         // IF the authenticated user has no other light THEN assign first light to that user.
-        if($(".chip-light [data-username=" + authenticatedUser + "]").length == 0)
+        if($(".chip-light[data-username=" + authenticatedUser + "]").length == 0)
         {
             // Select first light for user.
-            selectLight($("#" + blink1.deviceId + "-light .light-ok"), authenticatedUser, "PLACEHOLDER");
+            var displayName = $(".mdl-card[data-username=soke]").data("displayname");
+            selectLight($("#" + blink1.deviceId + "-light .light-ok"), authenticatedUser, displayName);
         }
       }
     });
