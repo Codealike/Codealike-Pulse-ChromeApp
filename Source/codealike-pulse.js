@@ -142,7 +142,7 @@ $(document).ready(function () {
       return false;
     }
 
-    var username = $("#username").val().trim();
+    var username = $("#username").val().trim().toLowerCase();
 
     if ($.inArray(username, users) == -1) {
       addUser(username, showMessage);
@@ -185,8 +185,15 @@ $(document).ready(function () {
       return value != username;
     });
 
+    //IF there's any light for this user THEN remove the light representation and add it again.
+    if($(".chip-light[data-username=" + DOMFriendlyId(username) + "]").length > 0)
+    {
+      $($(".chip-light[data-username=" + DOMFriendlyId(username) + "] .username")[0]).html("");
+      $($(".chip-light[data-username=" + DOMFriendlyId(username) + "]")[0]).attr("data-username","");
+    }
+
     chrome.storage.sync.set({ "users": users }, function () {
-      $("#" + username + "-card").remove();
+      $("#" + DOMFriendlyId(username) + "-card").remove();
       $("#add-user").show();
       snackbarContainer.MaterialSnackbar.showSnackbar({ message: "The user " + username + " was deleted from dashboard." });
       $("#add-user-spinner").hide();
@@ -217,7 +224,7 @@ $(document).ready(function () {
 
           $.get('assets/templates/user-card.mst', function (template) {
             data.responseJSON.FullIdentity = data.responseJSON.Identity;
-            data.responseJSON.Identity = data.responseJSON.Identity.replace(/\./g, '');
+            data.responseJSON.Identity = data.responseJSON.Identity;
 
             data.responseJSON.IsYou = (data.responseJSON.Identity == apiToken.split("/")[0]);
 
@@ -226,7 +233,7 @@ $(document).ready(function () {
             $('#grid-cards').append(html);
 
             var remoteImage,
-              container = document.querySelector("#" + data.responseJSON.Identity + "-card .avatar");
+              container = document.querySelector("#" + DOMFriendlyId(data.responseJSON.Identity) + "-card .avatar");
 
             remoteImage = new RAL.RemoteImage(data.responseJSON.AvatarUri);
             container.appendChild(remoteImage.element);
@@ -243,16 +250,19 @@ $(document).ready(function () {
             if($("#lights").children().length > 0)
             {
               // IF this user is the authenticated user.
-              if($("#" + apiToken.split("/")[0] + "-card").length == 1 && apiToken.split("/")[0] == username)
+              if($("#" + DOMFriendlyId(apiToken.split("/")[0]) + "-card").length == 1 && apiToken.split("/")[0] == username)
               {
-                var firstLight = $(".chip-light").first();
-
-                if(firstLight != undefined)
+                if($(".chip-light[data-username='']").length > 0)
                 {
-                  var lightID = $(firstLight).data("light");
+                  var firstLight = $(".chip-light[data-username='']").first();
 
-                  // Assign first light to this user.
-                  selectLight($("#" + lightID + "-light .light-ok"), username, data.responseJSON.DisplayName);
+                  if(firstLight != undefined)
+                  {
+                    var lightID = $(firstLight).data("light");
+
+                    // Assign first light to this user.
+                    selectLight($("#" + lightID + "-light .light-ok"), username, data.responseJSON.DisplayName);
+                  }
                 }
               }
             }
@@ -329,7 +339,10 @@ $(document).ready(function () {
 
       blink1.connect(function (success) {
         if (success) {
+
           $(control).parent().attr("data-username", username);
+
+          username = DOMFriendlyId(username);
 
           if($("#" + username + "-card .user-card-square .pulse-status").hasClass("red"))
           {
@@ -418,17 +431,15 @@ var bg = undefined;
 
       $("#lights").append(html);
 
-      var authenticatedUser = apiToken.split("/")[0];
-
       // IF the authenticated user exists among the users
-      if($(".mdl-card[data-username=" + authenticatedUser + "]").children().length > 0)
+      if($(".mdl-card[data-username=" + DOMFriendlyId(apiToken.split("/")[0]) + "]").children().length > 0)
       {
         // IF the authenticated user has no other light THEN assign first light to that user.
-        if($(".chip-light[data-username=" + authenticatedUser + "]").length == 0)
+        if($(".chip-light[data-username=" + DOMFriendlyId(apiToken.split("/")[0]) + "]").length == 0)
         {
             // Select first light for user.
-            var displayName = $(".mdl-card[data-username=soke]").data("displayname");
-            selectLight($("#" + blink1.deviceId + "-light .light-ok"), authenticatedUser, displayName);
+            var displayName = $(".mdl-card[data-username=" + DOMFriendlyId(apiToken.split("/")[0]) + "]").data("displayname");
+            selectLight($("#" + blink1.deviceId + "-light .light-ok"), apiToken.split("/")[0], displayName);
         }
       }
     });
@@ -503,12 +514,10 @@ function updateCanInterruptUserStatus(usernames) {
 };
 
 function defineInterruptionStatusUI(username, result) {
-  username = username.replace(/\./g, '');
+  username = DOMFriendlyId(username);
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
-
-
 
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
@@ -560,4 +569,8 @@ function defineInterruptionStatusUI(username, result) {
       });
     }
   }
+}
+
+function DOMFriendlyId( myid ) {
+    return myid.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
 }
