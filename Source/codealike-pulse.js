@@ -2,7 +2,9 @@ var users = [];
 var selectedUsername = "";
 var selectedDisplayName = "";
 var apiToken = "";
+var onboardingMode = true;
 var apiOk = false;
+var rootURL = "https://codealike.com";
 
 $(document).ready(function () {
 
@@ -15,14 +17,35 @@ $(document).ready(function () {
     if($.isEmptyObject(val))
     {
       $("#onboarding").show();
+      onboardingMode = true;
       $("#offline-mode").hide();
       $("#online-mode").hide();
     }
     else
     {
       setToken(val.token);
+
+      chrome.storage.sync.get("rooturl", function (val) {
+    
+        if($.isEmptyObject(val))
+        {
+          $("#onboarding").show();
+          onboardingMode = true;
+          $("#offline-mode").hide();
+          $("#online-mode").hide();
+        }
+        else
+        {
+          setRootURL(val.rooturl);
+
+          getUsers();
+          updateCanInterruptStatusBatch();  
+        }
+      });  
     }
   });
+
+
 
   $(document).on('click', ".user-selection", function () {
 
@@ -44,10 +67,17 @@ $(document).ready(function () {
 
   $("#codealike-api-token").change(function(e){
     setToken($("#codealike-api-token").val());
+
+    getUsers();
+    updateCanInterruptStatusBatch();  
   });
 
   $("#onboarding-ok").click(function(e){
     setToken($("#onboarding-token").val());
+    setRootURL($("#server-url").val());
+
+    getUsers();
+    updateCanInterruptStatusBatch();  
   });
 
   function setToken(token)
@@ -60,9 +90,20 @@ $(document).ready(function () {
     });
 
     apiOk = true;
+  }
 
-    getUsers();
-    updateCanInterruptStatusBatch();    
+  function setRootURL(url)
+  {
+    url = url.toLowerCase().trim();
+
+    if (url.substring(url.length-1) == "\\")
+    {
+        url = url.substring(0, url.length-1);
+    }
+
+    chrome.storage.sync.set({ "rooturl": url }, function () {
+      rootURL = url;
+    });  
   }
 
   $(document).on('click', ".light-ok", function () {
@@ -117,6 +158,7 @@ $(document).ready(function () {
         $("#online-mode").show();
         $("#offline-mode").hide();
         $("#onboarding").hide();
+        onboardingMode = false;
 
     });
   }
@@ -210,7 +252,7 @@ $(document).ready(function () {
 
     $.ajax({
       type: "GET",
-      url: "https://codealike.com/api/v2/account/" + username + "/profile",
+      url: rootURL + "/api/v2/account/" + username + "/profile",
       contentType: "application/json",
       dataType: "json",
       cache: false,
@@ -220,12 +262,12 @@ $(document).ready(function () {
         request.setRequestHeader("X-Api-Token", token);
       },
       complete: function (data, textStatus, jqXHR) {
-        if (data.statusText == "success") {
+        if (data.status == "200") {
 
           $.get('assets/templates/user-card.mst', function (template) {
             data.responseJSON.FullIdentity = data.responseJSON.Identity;
             data.responseJSON.Identity = data.responseJSON.Identity;
-
+            data.responseJSON.FactsURL = rootURL + "/facts/" + data.responseJSON.FullIdentity;
             data.responseJSON.IsYou = (data.responseJSON.Identity == apiToken.split("/")[0]);
 
             var html = Mustache.to_html(template, data.responseJSON);
@@ -243,8 +285,10 @@ $(document).ready(function () {
             RAL.Queue.start();
 
             $("#online-mode").show();
+            $("#current-url").html(rootURL);
             $("#offline-mode").hide();
             $("#onboarding").hide();
+            onboardingMode = false;
 
             // IF is there's any light connected
             if($("#lights").children().length > 0)
@@ -293,6 +337,7 @@ $(document).ready(function () {
             $("#online-mode").hide();
             $("#offline-mode").hide();
             $("#onboarding").show();
+            onboardingMode = true;
             $("#add-user").show();
             $("#add-user-spinner").hide();
 
@@ -318,6 +363,7 @@ $(document).ready(function () {
             $("#online-mode").hide();
             $("#offline-mode").show();
             $("#onboarding").hide();
+            onboardingMode = false;
             $("#add-user").show();
             $("#add-user-spinner").hide();
 
@@ -468,7 +514,7 @@ var bg = undefined;
 } ());
 
 function updateCanInterruptStatusBatch() {
-  if (users.length > 0) {
+  if (users.length > 0 && onboardingMode == false) {
     $.unique(users);
 
     updateCanInterruptUserStatus(users);
@@ -480,7 +526,7 @@ function updateCanInterruptStatusBatch() {
 function updateCanInterruptUserStatus(usernames) {
   $.ajax({
     type: 'POST',
-    url: 'https://codealike.com/api/v2/public/CanInterruptUser',
+    url: rootURL + "/api/v2/public/CanInterruptUser",
     data: JSON.stringify({ UserNames: usernames }),
     dataType: 'json',
     contentType: 'application/json'
