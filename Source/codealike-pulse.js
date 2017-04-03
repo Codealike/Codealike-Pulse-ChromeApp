@@ -96,7 +96,7 @@ $(document).ready(function () {
   {
     url = url.toLowerCase().trim();
 
-    if (url.substring(url.length-1) == "\\")
+    if (url.substring(url.length-1) == "/")
     {
         url = url.substring(0, url.length-1);
     }
@@ -356,6 +356,21 @@ $(document).ready(function () {
               callback("404");
 
             return { result: "404" };
+          }
+          else if(data.status == 0)
+          {
+            console.log("Receiving activity from Server FAILED");
+            $("#online-mode").hide();
+            $("#offline-mode").hide();
+            $("#onboarding").show();
+            onboardingMode = true;
+            $("#add-user").hide();
+            $("#add-user-spinner").hide();
+
+            if(callback)
+              callback("failed");
+
+            return { result: "failed" };
           }
           else
           {
