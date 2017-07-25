@@ -87,6 +87,8 @@ $(document).ready(function () {
     chrome.storage.sync.set({ "token": apiToken }, function () {
       $("#codealike-api-token").val(apiToken);
       $("#onboarding-token").val(apiToken);
+      $("#codealike-api-token").parent().addClass("is-dirty");
+      $("#onboarding-token").parent().addClass("is-dirty");
     });
 
     apiOk = true;

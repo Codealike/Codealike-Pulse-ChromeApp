@@ -38,24 +38,42 @@
   <div id="onboarding" class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
     <main class="mdl-layout__content darkOrange">
       <div class="page-content">
-        <!-- Your content goes here -->
-          <div class="mdl-typography--text-center">
-              <h1><i class="material-icons font-size-50">lock</i></h1>
-              <h1>We need your Codealike API Token and the Server URL</h1>
-              <h4>In order to set a proper connection to Codealike's servers, we need your API Token.</h4>
-              <!-- Textfield with Floating Label -->
-
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="onboarding-token">
-                <label class="mdl-textfield__label" for="onboarding-token">Your Codealike API Token</label>
+          <div>
+            <img src="/assets/img/mainheadLogo.png" alt="Codealike Pulse">
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--8-col">
+                  <div class="onboarding-card-event mdl-card mdl-shadow--2dp">
+                    <h1>
+                      <i class="material-icons font-size-50">lock</i>
+                      Let's connect!
+                    </h1>
+                    <div class="mdl-card__title mdl-card--expand">
+                      <br>
+                      <span>In order to set a proper connection to Codealike, lets confirm server and enter your API Token.</h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col">
+                  <div class="mdl-cell--12-col">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label extrawide">
+                      <input class="mdl-textfield__input" type="text" id="server-url" value="https://codealike.com">
+                      <label class="mdl-textfield__label" for="server-url">Server URL</label>
+                    </div>
+                  </div>
+                  <div class="mdl-cell--12-col">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label extrawide">
+                      <input class="mdl-textfield__input" type="text" id="onboarding-token">
+                      <label class="mdl-textfield__label" for="onboarding-token">Your Codealike API Token</label>
+                    </div>                    
+                  </div>
+                  <div class="mdl-cell--12-col">
+                    <button id="onboarding-ok" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                      START
+                    </button>
+                  </div>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
               </div>
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="server-url" value="https://codealike.com">
-                <label class="mdl-textfield__label" for="server-url">Server URL</label>
-              </div>
-              <button id="onboarding-ok" class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
-                <i class="material-icons">arrow_forward</i>
-              </button>
           </div>
       </div>
     </main>
