@@ -209,7 +209,7 @@ $(document).ready(function () {
         break;
 
       case "failed":
-        snackbarContainer.MaterialSnackbar.showSnackbar({ message: "Something failed. Got Internet? Got power? Try again?" });
+        snackbarContainer.MaterialSnackbar.showSnackbar({ message: "Something failed. Got Internet? Got power? :-/ Try again?" });
         break;
 
       default:
@@ -292,7 +292,7 @@ $(document).ready(function () {
             $("#onboarding").hide();
             onboardingMode = false;
 
-            // IF is there's any light connected
+            // IF there's any light connected
             if($("#lights").children().length > 0)
             {
               // IF this user is the authenticated user.
@@ -585,7 +585,7 @@ function defineInterruptionStatusUI(username, result) {
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
     var devices = $('.chip-light').filter(function () {
-      return $(this).data("username") == username;
+      return this.getAttribute("data-username") == username;
     });
 
     if (devices.length > 0) {
@@ -602,7 +602,7 @@ function defineInterruptionStatusUI(username, result) {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
     var devices = $('.chip-light').filter(function () {
-      return $(this).data("username") == username;
+      return this.getAttribute("data-username") == username;
     });
 
     if (devices.length > 0) {
@@ -619,7 +619,7 @@ function defineInterruptionStatusUI(username, result) {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
 
     var devices = $('.chip-light').filter(function () {
-      return $(this).data("username") == username;
+      return this.getAttribute("data-username") == username;
     });
 
     if (devices.length > 0) {
