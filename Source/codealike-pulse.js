@@ -45,8 +45,6 @@ $(document).ready(function () {
     }
   });
 
-
-
   $(document).on('click', ".user-selection", function () {
 
     selectedUsername = "";
@@ -506,7 +504,6 @@ var bg = undefined;
         }
       }
     });
-
   }
 
   function setActiveDevice(blink1) {
@@ -549,25 +546,16 @@ function updateCanInterruptUserStatus(usernames) {
     contentType: 'application/json'
   })
     .done(function (success) {
-
       $("#online-mode").show();
       $("#offline-mode").hide();
 
       var allUsersResult = $.map(users, function (user) {
-        var exists = false;
-        var value = "NoActivity"
-
         $.each(success, function (index, e) {
           var username = e.m_Item1;
           var result = e.m_Item2;
 
-          if (user == username) {
-            value = result;
-            return false;
-          }
+          defineInterruptionStatusUI(username, result);
         });
-
-        defineInterruptionStatusUI(user, value);
       });
     })
     .fail(function () {
@@ -580,7 +568,6 @@ function defineInterruptionStatusUI(username, result) {
   username = DOMFriendlyId(username);
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
-  $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
 
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
@@ -598,7 +585,7 @@ function defineInterruptionStatusUI(username, result) {
       });
     }
   }
-  else if (result == "CannotInterrupt") {
+  else {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
     var devices = $('.chip-light').filter(function () {
@@ -611,23 +598,6 @@ function defineInterruptionStatusUI(username, result) {
       blink1.connect(function (success) {
         if (success) {
           blink1.fadeRgb(164, 3, 0, 250, 0);
-        }
-      });
-    }
-  }
-  else {
-    $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
-
-    var devices = $('.chip-light').filter(function () {
-      return this.getAttribute("data-username") == username;
-    });
-
-    if (devices.length > 0) {
-      var blink1 = new Blink1($(devices).data("light"));
-
-      blink1.connect(function (success) {
-        if (success) {
-          blink1.fadeRgb(0, 159, 0, 250, 0);
         }
       });
     }
