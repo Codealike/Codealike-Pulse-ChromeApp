@@ -1,7 +1,7 @@
 {
   "name": "Codealike Pulse",
   "manifest_version": 2,
-  "version": "0.7.2",
+  "version": "0.7.3",
   "minimum_chrome_version": "39.0.2140.0",
   "app": {
     "background": {

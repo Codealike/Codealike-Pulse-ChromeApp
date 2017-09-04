@@ -126,3 +126,7 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
 .onboarding-card-event > .mdl-card__actions > .mdl-button {
   color: #fff;
 }
+
+.username-title{
+  font-size: 18px!important;
+}
