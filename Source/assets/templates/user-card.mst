@@ -1,17 +1,20 @@
 <div id="{{Identity}}-card" class="mdl-cell mdl-cell--2-col">
     <div class="user-card-square mdl-card mdl-shadow--2dp" data-username="{{Identity}}" data-displayName="{{DisplayName}}">
         <div class="mdl-card__title mdl-card--expand hand white user-selection">
-            <h3 class="mdl-card__title-text"><div class="avatar avatar-rounded"></div>{{DisplayName}}
-                {{#IsYou}}
-                (You)
-                {{/IsYou}}
-            
+            <h3 class="mdl-card__title-text username-title">
+                <div class="avatar avatar-rounded"></div>
+                <span>
+                    {{DisplayName}}
+                    {{#IsYou}}
+                    (You)
+                    {{/IsYou}}
+                </span>
             </h3>
         </div>
         <div id="{{Identity}}-pulse" class="pulse-status grey"></div>
         <div class="mdl-card__supporting-text white">
             <div class="mdl-card__actions">
-                <a class="mdl-button mdl-js-button mdl-button--icon" href="https://codealike.com/facts/{{FullIdentity}}" target="_blank">
+                <a class="mdl-button mdl-js-button mdl-button--icon" href="{{FactsURL}}" target="_blank">
                     <i class="material-icons">stars</i>
                 </a>
                 <a class="mdl-button mdl-js-button mdl-button--icon delete" data-username="{{Identity}}">

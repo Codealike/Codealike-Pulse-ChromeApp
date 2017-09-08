@@ -2,7 +2,9 @@ var users = [];
 var selectedUsername = "";
 var selectedDisplayName = "";
 var apiToken = "";
+var onboardingMode = true;
 var apiOk = false;
+var rootURL = "https://codealike.com";
 
 $(document).ready(function () {
 
@@ -15,12 +17,31 @@ $(document).ready(function () {
     if($.isEmptyObject(val))
     {
       $("#onboarding").show();
+      onboardingMode = true;
       $("#offline-mode").hide();
       $("#online-mode").hide();
     }
     else
     {
       setToken(val.token);
+
+      chrome.storage.sync.get("rooturl", function (val) {
+    
+        if($.isEmptyObject(val))
+        {
+          $("#onboarding").show();
+          onboardingMode = true;
+          $("#offline-mode").hide();
+          $("#online-mode").hide();
+        }
+        else
+        {
+          setRootURL(val.rooturl);
+
+          getUsers();
+          updateCanInterruptStatusBatch();  
+        }
+      });  
     }
   });
 
@@ -44,10 +65,17 @@ $(document).ready(function () {
 
   $("#codealike-api-token").change(function(e){
     setToken($("#codealike-api-token").val());
+
+    getUsers();
+    updateCanInterruptStatusBatch();  
   });
 
   $("#onboarding-ok").click(function(e){
     setToken($("#onboarding-token").val());
+    setRootURL($("#server-url").val());
+
+    getUsers();
+    updateCanInterruptStatusBatch();  
   });
 
   function setToken(token)
@@ -57,12 +85,25 @@ $(document).ready(function () {
     chrome.storage.sync.set({ "token": apiToken }, function () {
       $("#codealike-api-token").val(apiToken);
       $("#onboarding-token").val(apiToken);
+      $("#codealike-api-token").parent().addClass("is-dirty");
+      $("#onboarding-token").parent().addClass("is-dirty");
     });
 
     apiOk = true;
+  }
 
-    getUsers();
-    updateCanInterruptStatusBatch();    
+  function setRootURL(url)
+  {
+    url = url.toLowerCase().trim();
+
+    if (url.substring(url.length-1) == "/")
+    {
+        url = url.substring(0, url.length-1);
+    }
+
+    chrome.storage.sync.set({ "rooturl": url }, function () {
+      rootURL = url;
+    });  
   }
 
   $(document).on('click', ".light-ok", function () {
@@ -117,6 +158,7 @@ $(document).ready(function () {
         $("#online-mode").show();
         $("#offline-mode").hide();
         $("#onboarding").hide();
+        onboardingMode = false;
 
     });
   }
@@ -142,7 +184,7 @@ $(document).ready(function () {
       return false;
     }
 
-    var username = $("#username").val().trim();
+    var username = $("#username").val().trim().toLowerCase();
 
     if ($.inArray(username, users) == -1) {
       addUser(username, showMessage);
@@ -165,7 +207,7 @@ $(document).ready(function () {
         break;
 
       case "failed":
-        snackbarContainer.MaterialSnackbar.showSnackbar({ message: "Something failed. Got Internet? Got power? Try again?" });
+        snackbarContainer.MaterialSnackbar.showSnackbar({ message: "Something failed. Got Internet? Got power? :-/ Try again?" });
         break;
 
       default:
@@ -185,8 +227,15 @@ $(document).ready(function () {
       return value != username;
     });
 
+    //IF there's any light for this user THEN remove the light representation and add it again.
+    if($(".chip-light[data-username=" + DOMFriendlyId(username) + "]").length > 0)
+    {
+      $($(".chip-light[data-username=" + DOMFriendlyId(username) + "] .username")[0]).html("");
+      $($(".chip-light[data-username=" + DOMFriendlyId(username) + "]")[0]).attr("data-username","");
+    }
+
     chrome.storage.sync.set({ "users": users }, function () {
-      $("#" + username + "-card").remove();
+      $("#" + DOMFriendlyId(username) + "-card").remove();
       $("#add-user").show();
       snackbarContainer.MaterialSnackbar.showSnackbar({ message: "The user " + username + " was deleted from dashboard." });
       $("#add-user-spinner").hide();
@@ -203,7 +252,7 @@ $(document).ready(function () {
 
     $.ajax({
       type: "GET",
-      url: "https://codealike.com/api/v2/account/" + username + "/profile",
+      url: rootURL + "/api/v2/account/" + username + "/profile",
       contentType: "application/json",
       dataType: "json",
       cache: false,
@@ -213,12 +262,12 @@ $(document).ready(function () {
         request.setRequestHeader("X-Api-Token", token);
       },
       complete: function (data, textStatus, jqXHR) {
-        if (data.statusText == "success") {
+        if (data.status == "200") {
 
           $.get('assets/templates/user-card.mst', function (template) {
             data.responseJSON.FullIdentity = data.responseJSON.Identity;
-            data.responseJSON.Identity = data.responseJSON.Identity.replace(/\./g, '');
-
+            data.responseJSON.Identity = data.responseJSON.Identity;
+            data.responseJSON.FactsURL = rootURL + "/facts/" + data.responseJSON.FullIdentity;
             data.responseJSON.IsYou = (data.responseJSON.Identity == apiToken.split("/")[0]);
 
             var html = Mustache.to_html(template, data.responseJSON);
@@ -226,7 +275,7 @@ $(document).ready(function () {
             $('#grid-cards').append(html);
 
             var remoteImage,
-              container = document.querySelector("#" + data.responseJSON.Identity + "-card .avatar");
+              container = document.querySelector("#" + DOMFriendlyId(data.responseJSON.Identity) + "-card .avatar");
 
             remoteImage = new RAL.RemoteImage(data.responseJSON.AvatarUri);
             container.appendChild(remoteImage.element);
@@ -236,23 +285,28 @@ $(document).ready(function () {
             RAL.Queue.start();
 
             $("#online-mode").show();
+            $("#current-url").html(rootURL);
             $("#offline-mode").hide();
             $("#onboarding").hide();
+            onboardingMode = false;
 
-            // IF is there's any light connected
+            // IF there's any light connected
             if($("#lights").children().length > 0)
             {
               // IF this user is the authenticated user.
-              if($("#" + apiToken.split("/")[0] + "-card").length == 1 && apiToken.split("/")[0] == username)
+              if($("#" + DOMFriendlyId(apiToken.split("/")[0]) + "-card").length == 1 && apiToken.split("/")[0] == username)
               {
-                var firstLight = $(".chip-light").first();
-
-                if(firstLight != undefined)
+                if($(".chip-light[data-username='']").length > 0)
                 {
-                  var lightID = $(firstLight).data("light");
+                  var firstLight = $(".chip-light[data-username='']").first();
 
-                  // Assign first light to this user.
-                  selectLight($("#" + lightID + "-light .light-ok"), username, data.responseJSON.DisplayName);
+                  if(firstLight != undefined)
+                  {
+                    var lightID = $(firstLight).data("light");
+
+                    // Assign first light to this user.
+                    selectLight($("#" + lightID + "-light .light-ok"), username, data.responseJSON.DisplayName);
+                  }
                 }
               }
             }
@@ -283,6 +337,7 @@ $(document).ready(function () {
             $("#online-mode").hide();
             $("#offline-mode").hide();
             $("#onboarding").show();
+            onboardingMode = true;
             $("#add-user").show();
             $("#add-user-spinner").hide();
 
@@ -302,12 +357,28 @@ $(document).ready(function () {
 
             return { result: "404" };
           }
+          else if(data.status == 0)
+          {
+            console.log("Receiving activity from Server FAILED");
+            $("#online-mode").hide();
+            $("#offline-mode").hide();
+            $("#onboarding").show();
+            onboardingMode = true;
+            $("#add-user").hide();
+            $("#add-user-spinner").hide();
+
+            if(callback)
+              callback("failed");
+
+            return { result: "failed" };
+          }
           else
           {
             console.log("Receiving activity from Server FAILED");
             $("#online-mode").hide();
             $("#offline-mode").show();
             $("#onboarding").hide();
+            onboardingMode = false;
             $("#add-user").show();
             $("#add-user-spinner").hide();
 
@@ -329,7 +400,10 @@ $(document).ready(function () {
 
       blink1.connect(function (success) {
         if (success) {
+
           $(control).parent().attr("data-username", username);
+
+          username = DOMFriendlyId(username);
 
           if($("#" + username + "-card .user-card-square .pulse-status").hasClass("red"))
           {
@@ -418,21 +492,18 @@ var bg = undefined;
 
       $("#lights").append(html);
 
-      var authenticatedUser = apiToken.split("/")[0];
-
       // IF the authenticated user exists among the users
-      if($(".mdl-card[data-username=" + authenticatedUser + "]").children().length > 0)
+      if($(".mdl-card[data-username=" + DOMFriendlyId(apiToken.split("/")[0]) + "]").children().length > 0)
       {
         // IF the authenticated user has no other light THEN assign first light to that user.
-        if($(".chip-light[data-username=" + authenticatedUser + "]").length == 0)
+        if($(".chip-light[data-username=" + DOMFriendlyId(apiToken.split("/")[0]) + "]").length == 0)
         {
             // Select first light for user.
-            var displayName = $(".mdl-card[data-username=soke]").data("displayname");
-            selectLight($("#" + blink1.deviceId + "-light .light-ok"), authenticatedUser, displayName);
+            var displayName = $(".mdl-card[data-username=" + DOMFriendlyId(apiToken.split("/")[0]) + "]").data("displayname");
+            selectLight($("#" + blink1.deviceId + "-light .light-ok"), apiToken.split("/")[0], displayName);
         }
       }
     });
-
   }
 
   function setActiveDevice(blink1) {
@@ -457,7 +528,7 @@ var bg = undefined;
 } ());
 
 function updateCanInterruptStatusBatch() {
-  if (users.length > 0) {
+  if (users.length > 0 && onboardingMode == false) {
     $.unique(users);
 
     updateCanInterruptUserStatus(users);
@@ -469,31 +540,22 @@ function updateCanInterruptStatusBatch() {
 function updateCanInterruptUserStatus(usernames) {
   $.ajax({
     type: 'POST',
-    url: 'https://codealike.com/api/v2/public/CanInterruptUser',
+    url: rootURL + "/api/v2/public/CanInterruptUser",
     data: JSON.stringify({ UserNames: usernames }),
     dataType: 'json',
     contentType: 'application/json'
   })
     .done(function (success) {
-
       $("#online-mode").show();
       $("#offline-mode").hide();
 
       var allUsersResult = $.map(users, function (user) {
-        var exists = false;
-        var value = "NoActivity"
-
         $.each(success, function (index, e) {
           var username = e.m_Item1;
           var result = e.m_Item2;
 
-          if (user == username) {
-            value = result;
-            return false;
-          }
+          defineInterruptionStatusUI(username, result);
         });
-
-        defineInterruptionStatusUI(user, value);
       });
     })
     .fail(function () {
@@ -503,17 +565,14 @@ function updateCanInterruptUserStatus(usernames) {
 };
 
 function defineInterruptionStatusUI(username, result) {
-  username = username.replace(/\./g, '');
+  username = DOMFriendlyId(username);
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
-  $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
-
-
 
   if (result == "NoActivity") {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
     var devices = $('.chip-light').filter(function () {
-      return $(this).data("username") == username;
+      return this.getAttribute("data-username") == username;
     });
 
     if (devices.length > 0) {
@@ -526,11 +585,11 @@ function defineInterruptionStatusUI(username, result) {
       });
     }
   }
-  else if (result == "CannotInterrupt") {
+  else {
     $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
 
     var devices = $('.chip-light').filter(function () {
-      return $(this).data("username") == username;
+      return this.getAttribute("data-username") == username;
     });
 
     if (devices.length > 0) {
@@ -543,21 +602,8 @@ function defineInterruptionStatusUI(username, result) {
       });
     }
   }
-  else {
-    $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
+}
 
-    var devices = $('.chip-light').filter(function () {
-      return $(this).data("username") == username;
-    });
-
-    if (devices.length > 0) {
-      var blink1 = new Blink1($(devices).data("light"));
-
-      blink1.connect(function (success) {
-        if (success) {
-          blink1.fadeRgb(0, 159, 0, 250, 0);
-        }
-      });
-    }
-  }
+function DOMFriendlyId( myid ) {
+    return myid.replace( /(:|\.|\[|\]|,|=|@)/g, "\\$1" );
 }
