@@ -21,8 +21,14 @@ input[type=range]:disabled::-webkit-slider-runnable-track {
   background-color: #78cd51;
 }
 
+.communityFlow {
+  background-color:#3D2966;
+}
 .red {
   background-color: #ff5454;
+}
+.in-the-zone {
+  background-color: #F0B0D6;
 }
 
 .grey {

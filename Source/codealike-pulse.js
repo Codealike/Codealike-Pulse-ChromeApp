@@ -405,9 +405,9 @@ $(document).ready(function () {
 
           username = DOMFriendlyId(username);
 
-          if($("#" + username + "-card .user-card-square .pulse-status").hasClass("red"))
+          if($("#" + username + "-card .user-card-square .pulse-status").hasClass("in-the-zone"))
           {
-            blink1.fadeRgb(164, 3, 0, 250, 0);
+            blink1.fadeRgb(229, 0, 255, 250, 0);
           }
           else if($("#" + username + "-card .user-card-square .pulse-status").hasClass("darkGreen"))
           {
@@ -567,26 +567,29 @@ function updateCanInterruptUserStatus(usernames) {
 function defineInterruptionStatusUI(username, result) {
   username = DOMFriendlyId(username);
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
-  $("#" + username + "-card .user-card-square .pulse-status").removeClass("red");
+  $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
+  $("#" + username + "-card .user-card-square .pulse-status").removeClass("in-the-zone");
 
-  if (result == "NoActivity") {
-    $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
-    var devices = $('.chip-light').filter(function () {
-      return this.getAttribute("data-username") == username;
+switch (result.toLowerCase()) {
+  case "noactivity":
+  $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
+  var devices = $('.chip-light').filter(function () {
+    return this.getAttribute("data-username") == username;
+  });
+
+  if (devices.length > 0) {
+    var blink1 = new Blink1($(devices).data("light"));
+
+    blink1.connect(function (success) {
+      if (success) {
+        blink1.fadeRgb(0, 0, 0, 0, 0);
+      }
     });
-
-    if (devices.length > 0) {
-      var blink1 = new Blink1($(devices).data("light"));
-
-      blink1.connect(function (success) {
-        if (success) {
-          blink1.fadeRgb(0, 0, 0, 0, 0);
-        }
-      });
-    }
   }
-  else {
-    $("#" + username + "-card .user-card-square .pulse-status").addClass("red");
+    break;
+
+    case "cannotinterrupt":
+    $("#" + username + "-card .user-card-square .pulse-status").addClass("in-the-zone");
 
     var devices = $('.chip-light').filter(function () {
       return this.getAttribute("data-username") == username;
@@ -597,10 +600,32 @@ function defineInterruptionStatusUI(username, result) {
 
       blink1.connect(function (success) {
         if (success) {
-          blink1.fadeRgb(164, 3, 0, 250, 0);
+          blink1.fadeRgb(229, 0, 255, 250, 0);
         }
       });
     }
+    break;
+
+    case "caninterrupt":
+    $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
+
+    var devices = $('.chip-light').filter(function () {
+      return this.getAttribute("data-username") == username;
+    });
+
+    if (devices.length > 0) {
+      var blink1 = new Blink1($(devices).data("light"));
+
+      blink1.connect(function (success) {
+        if (success) {
+          blink1.fadeRgb(0, 159, 0, 250, 0);
+        }
+      });
+    }
+    break;
+
+  default:
+    break;
   }
 }
 
