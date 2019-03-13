@@ -579,6 +579,8 @@ function defineInterruptionStatusUI(username, result, activity) {
                           lineColor: '#fff',
                           fillColor: '#000',
                           spotColor: '#ffffff',
+                          chartRangeMin: 0,
+                          chartRangeMax: 100,
                           minSpotColor: '#ffffff',
                           maxSpotColor: '#ffffff',
                           highlightSpotColor: '#c0c0c0',
