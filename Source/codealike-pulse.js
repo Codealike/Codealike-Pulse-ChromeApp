@@ -268,6 +268,7 @@ $(document).ready(function () {
             data.responseJSON.FullIdentity = data.responseJSON.Identity;
             data.responseJSON.Identity = data.responseJSON.Identity;
             data.responseJSON.FactsURL = rootURL + "/facts/" + data.responseJSON.FullIdentity;
+            data.responseJSON.ItzURL = rootURL + "/itz/" + data.responseJSON.FullIdentity;
             data.responseJSON.IsYou = (data.responseJSON.Identity == apiToken.split("/")[0]);
 
             var html = Mustache.to_html(template, data.responseJSON);
@@ -553,8 +554,9 @@ function updateCanInterruptUserStatus(usernames) {
         $.each(success, function (index, e) {
           var username = e.m_Item1;
           var result = e.m_Item2;
+          var activity = e.m_Item3;
 
-          defineInterruptionStatusUI(username, result);
+          defineInterruptionStatusUI(username, result, activity);
         });
       });
     })
@@ -564,64 +566,77 @@ function updateCanInterruptUserStatus(usernames) {
     });
 };
 
-function defineInterruptionStatusUI(username, result) {
+function defineInterruptionStatusUI(username, result, activity) {
   username = DOMFriendlyId(username);
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("grey");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("darkGreen");
   $("#" + username + "-card .user-card-square .pulse-status").removeClass("in-the-zone");
 
+  $("#" + username + "-sparkline").sparkline(activity, {
+                          type: 'line',
+                          width: '100%',
+                          height: '50px',
+                          lineColor: '#fff',
+                          fillColor: '#000',
+                          spotColor: '#ffffff',
+                          minSpotColor: '#ffffff',
+                          maxSpotColor: '#ffffff',
+                          highlightSpotColor: '#c0c0c0',
+                          highlightLineColor: '#ffffff'
+                        });
+
 switch (result.toLowerCase()) {
   case "noactivity":
-  $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
-  var devices = $('.chip-light').filter(function () {
-    return this.getAttribute("data-username") == username;
-  });
-
-  if (devices.length > 0) {
-    var blink1 = new Blink1($(devices).data("light"));
-
-    blink1.connect(function (success) {
-      if (success) {
-        blink1.fadeRgb(0, 0, 0, 0, 0);
-      }
+    $("#" + username + "-card .user-card-square .pulse-status").addClass("grey");
+    var devices = $('.chip-light').filter(function () {
+      return this.getAttribute("data-username") == username;
     });
-  }
+
+    if (devices.length > 0) {
+      var blink1 = new Blink1($(devices).data("light"));
+
+      blink1.connect(function (success) {
+        if (success) {
+          blink1.fadeRgb(0, 0, 0, 0, 0);
+        }
+      });
+    }
     break;
 
     case "cannotinterrupt":
-    $("#" + username + "-card .user-card-square .pulse-status").addClass("in-the-zone");
+      $("#" + username + "-card .user-card-square .pulse-status").addClass("in-the-zone");
 
-    var devices = $('.chip-light').filter(function () {
-      return this.getAttribute("data-username") == username;
-    });
-
-    if (devices.length > 0) {
-      var blink1 = new Blink1($(devices).data("light"));
-
-      blink1.connect(function (success) {
-        if (success) {
-          blink1.fadeRgb(229, 0, 255, 250, 0);
-        }
+      var devices = $('.chip-light').filter(function () {
+        return this.getAttribute("data-username") == username;
       });
-    }
+
+      if (devices.length > 0) {
+        var blink1 = new Blink1($(devices).data("light"));
+
+        blink1.connect(function (success) {
+          if (success) {
+            blink1.fadeRgb(229, 0, 255, 250, 0);
+          }
+        });
+      }
     break;
 
     case "caninterrupt":
-    $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
+      $("#" + username + "-card .user-card-square .pulse-status").addClass("darkGreen");
 
-    var devices = $('.chip-light').filter(function () {
-      return this.getAttribute("data-username") == username;
-    });
-
-    if (devices.length > 0) {
-      var blink1 = new Blink1($(devices).data("light"));
-
-      blink1.connect(function (success) {
-        if (success) {
-          blink1.fadeRgb(0, 159, 0, 250, 0);
-        }
+      var devices = $('.chip-light').filter(function () {
+        return this.getAttribute("data-username") == username;
       });
-    }
+
+      if (devices.length > 0) {
+        var blink1 = new Blink1($(devices).data("light"));
+
+        blink1.connect(function (success) {
+          if (success) {
+            blink1.fadeRgb(0, 159, 0, 250, 0);
+          }
+        });
+      }
     break;
 
   default:
