@@ -1,7 +1,7 @@
 {
-  "name": "Codealike Pulse",
+  "name": "Codealike In-The-Zone Dashboard",
   "manifest_version": 2,
-  "version": "0.7.3",
+  "version": "0.7.7",
   "minimum_chrome_version": "39.0.2140.0",
   "app": {
     "background": {

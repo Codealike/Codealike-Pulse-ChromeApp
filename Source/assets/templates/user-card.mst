@@ -11,13 +11,17 @@
                 </span>
             </h3>
         </div>
+        <div id="{{Identity}}-sparkline"></div>
         <div id="{{Identity}}-pulse" class="pulse-status grey"></div>
         <div class="mdl-card__supporting-text white">
             <div class="mdl-card__actions">
-                <a class="mdl-button mdl-js-button mdl-button--icon" href="{{FactsURL}}" target="_blank">
+                <a class="mdl-button mdl-js-button mdl-button--icon" href="{{FactsURL}}" target="_blank" title="{{DisplayName}} Facts page">
                     <i class="material-icons">stars</i>
                 </a>
-                <a class="mdl-button mdl-js-button mdl-button--icon delete" data-username="{{Identity}}">
+                <a class="mdl-button mdl-js-button mdl-button--icon" href="{{ItzURL}}" target="_blank" title="In-The-Zone dashboard">
+                    <i class="material-icons">lens</i>
+                </a>
+                <a class="mdl-button mdl-js-button mdl-button--icon delete" data-username="{{Identity}}" title="Remove {{DisplayName}} from this dashboard">
                     <i class="material-icons">delete</i>
                 </a>
             </div>
