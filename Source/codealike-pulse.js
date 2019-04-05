@@ -56,13 +56,6 @@ $(document).ready(function () {
     }
   });
 
-  $("#codealike-api-token").change(function (e) {
-    setToken($("#codealike-api-token").val());
-
-    getUsers();
-    updateCanInterruptStatusBatch();
-  });
-
   $("#logout").click(function (e) {
 		$("#online-mode").hide();
 		$("#offline-mode").hide();
@@ -84,9 +77,7 @@ $(document).ready(function () {
     chrome.storage.sync.set({
       "token": apiToken
     }, function () {
-      $("#codealike-api-token").val(apiToken);
       $("#onboarding-token").val(apiToken);
-      $("#codealike-api-token").parent().addClass("is-dirty");
       $("#onboarding-token").parent().addClass("is-dirty");
     });
 
